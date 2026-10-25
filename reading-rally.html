@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Natasha’s PERT Reading Rally</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F5FB; --surface:#FFFFFF; --ink:#14243B; --muted:#55657D; --line:#D5DCE8;
+  --blue:#2F55E8; --blue-ink:#FFFFFF; --hl:#FFD84D; --hl-ink:#14243B;
+  --good:#14804F; --good-bg:#E1F4EA; --bad:#C93A3F; --bad-bg:#FCE7E8;
+  --display:"Bricolage Grotesque","Trebuchet MS",Arial,sans-serif;
+  --read:"Source Serif 4",Georgia,"Times New Roman",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1A2B; --surface:#172538; --ink:#EAF0FA; --muted:#9DB0CB; --line:#2B3C55;
+    --blue:#8AA2FF; --blue-ink:#0F1A2B; --hl:#7A6414; --hl-ink:#FFF3C2;
+    --good:#5FD39A; --good-bg:#12382A; --bad:#FF8A8E; --bad-bg:#3F1D22;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1A2B; --surface:#172538; --ink:#EAF0FA; --muted:#9DB0CB; --line:#2B3C55;
+  --blue:#8AA2FF; --blue-ink:#0F1A2B; --hl:#7A6414; --hl-ink:#FFF3C2;
+  --good:#5FD39A; --good-bg:#12382A; --bad:#FF8A8E; --bad-bg:#3F1D22;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--display);font-weight:500;line-height:1.45;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 56px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+/* Home */
+.brand{font-weight:800;font-size:15px;letter-spacing:.01em;color:var(--muted);margin:0 0 18px}
+h1{font-weight:800;font-size:clamp(34px,9vw,56px);line-height:1.02;margin:0 0 14px;letter-spacing:-.02em}
+h1 .mark{background:linear-gradient(transparent 52%,var(--hl) 52%,var(--hl) 92%,transparent 92%);padding:0 .08em;color:var(--ink)}
+:root[data-theme="dark"] h1 .mark,
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) h1 .mark{color:var(--hl-ink)} }
+.lede{font-size:18px;color:var(--muted);margin:0 0 22px;max-width:46ch}
+.goal{display:inline-block;font-size:14px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:4px 12px;margin-bottom:22px}
+.modes{display:grid;gap:12px;margin-bottom:30px}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;width:100%;background:var(--surface);border:2px solid var(--ink);border-radius:14px;padding:16px 18px;box-shadow:4px 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.mode:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.mode b{font-size:20px;font-weight:800}
+.mode span{color:var(--muted);font-size:15px}
+.mode.primary{background:var(--blue);color:var(--blue-ink);border-color:var(--ink)}
+.mode.primary span{color:var(--blue-ink);opacity:.9}
+.mode[disabled]{opacity:.5;cursor:not-allowed;box-shadow:none}
+h2{font-size:22px;font-weight:800;margin:0 0 12px}
+.skills{display:grid;gap:8px;margin-bottom:26px}
+.skill{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+.skill:hover{border-color:var(--ink)}
+.skill .nm{font-weight:700}
+.skill .pc{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{grid-column:1/-1;height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:99px}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
+.stat{flex:1 1 130px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-size:26px;font-weight:800;line-height:1.1}
+.stat span{font-size:14px;color:var(--muted)}
+.fine{font-size:14px;color:var(--muted);max-width:60ch}
+.link{background:none;border:0;padding:0;text-decoration:underline;color:var(--muted);font-size:14px}
+
+/* Quiz */
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.exit{background:none;border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700}
+.prog{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--blue);transition:width .25s}
+.cnt{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.streak{font-size:14px;font-weight:800;background:var(--hl);color:var(--hl-ink);border-radius:999px;padding:3px 10px;white-space:nowrap}
+:root:not([data-theme="dark"]) .streak{color:#14243B}
+.page{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:18px 18px 14px;margin-bottom:16px}
+.page h3{font-size:18px;font-weight:800;margin:0 0 2px}
+.page .hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+.page p.para{font-family:var(--read);font-size:18px;line-height:1.65;margin:0 0 12px;max-width:68ch;font-weight:400}
+.s{cursor:pointer;border-radius:3px;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background .12s}
+.s.on{background:var(--hl);color:var(--hl-ink)}
+.q{font-size:20px;font-weight:700;line-height:1.3;margin:0 0 6px}
+.tag{display:inline-block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px}
+.opts{display:grid;gap:10px;margin:12px 0}
+.opt{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;text-align:left;width:100%;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:500;font-size:17px}
+.opt:not([disabled]):hover{border-color:var(--ink)}
+.ltr{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);font-weight:800;font-size:15px}
+.opt .why{grid-column:2;font-size:15px;color:var(--ink);opacity:.9;margin-top:2px;font-weight:500}
+.opt .why b{font-weight:800}
+.opt[disabled]{cursor:default;color:var(--ink)}
+.opt.right{background:var(--good-bg);border-color:var(--good)}
+.opt.right .ltr{background:var(--good);border-color:var(--good);color:var(--surface)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt.wrong .ltr{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.opt.dim{opacity:.85}
+.verdict{border-radius:12px;padding:12px 14px;margin:12px 0 0;font-weight:700}
+.verdict.ok{background:var(--good-bg);color:var(--ink);border:2px solid var(--good)}
+.verdict.no{background:var(--bad-bg);color:var(--ink);border:2px solid var(--bad)}
+.strategy{background:var(--surface);border:2px dashed var(--ink);border-radius:12px;padding:12px 14px;margin:12px 0;font-size:15px}
+.strategy b{font-weight:800}
+.cta{display:block;width:100%;background:var(--blue);color:var(--blue-ink);border:2px solid var(--ink);border-radius:14px;padding:14px 18px;font-weight:800;font-size:18px;box-shadow:4px 4px 0 var(--ink);margin-top:14px}
+.cta:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.cta.alt{background:var(--surface);color:var(--ink)}
+
+/* Results */
+.big{font-size:clamp(56px,16vw,92px);font-weight:800;line-height:1;margin:6px 0 4px;letter-spacing:-.03em}
+.rev{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.rev .rq{font-weight:700;margin:0 0 4px}
+.rev .ra{margin:0;font-size:15px;color:var(--muted)}
+.rev .ra b{color:var(--ink)}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin-bottom:10px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (min-width:600px){.modes{grid-template-columns:1fr 1fr}.mode.primary{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ---------- Content ---------- */
+var SK = {
+  MI:"Main idea", DT:"Details", IN:"Inference", VO:"Vocabulary in context",
+  PU:"Author\u2019s purpose", TO:"Tone and attitude", TS:"Text structure",
+  CE:"Claim and evidence", FL:"Figurative language"
+};
+var TIPS = {
+  MI:"The main idea covers the whole passage. If a choice only matches one sentence, it is too narrow. If it adds ideas the passage never mentions, it is too broad.",
+  DT:"Go back and find the exact sentence that answers the question. Do not answer from memory or from what just sounds true.",
+  IN:"A good inference is strongly pointed to by the text, not just possible. Ask yourself: which words in the passage back this up?",
+  VO:"Swap each choice into the sentence in place of the word. The one that keeps the meaning wins. Nearby sentences often hold clues.",
+  PU:"Ask why the author included this: to inform, persuade, entertain, or describe? Then check that the choice fits the whole passage, not one line.",
+  TO:"Look at the author\u2019s word choices. Are they warm, harsh, funny, neutral? Tone is the attitude, not the topic.",
+  TS:"Look for signal words like however, because, in contrast, and in the end. They show how the ideas are organized.",
+  CE:"Evidence is a fact or result that backs up a claim. A reason, a definition, or an opposing point is not the same thing as evidence.",
+  FL:"Figurative language is not literal. Ask what picture or feeling the comparison is trying to create."
+};
+
+/* Each option is [text, explanation]. Index 0 is always the best answer; options are shuffled when shown. */
+var PASSAGES = [
+{ id:"bees", title:"The Leaderless Hive", paras:[[
+  "A honeybee colony can hold more than fifty thousand workers, yet the hive runs without a single boss.",
+  "No bee tells the others what to do.",
+  "Instead, each worker responds to small signals, such as the smell of a hungry larva or the crowding near the entrance.",
+  "When the hive grows too warm, some bees fan their wings at the door while others fetch water to cool the comb.",
+  "The colony\u2019s decisions emerge from thousands of tiny choices, none of which any single bee understands in full."]],
+  qs:[
+  { skill:"MI", q:"Which statement best expresses the main idea of the passage?", o:[
+    ["A honeybee colony works well because many workers respond to local signals instead of orders.","Best answer. It covers the whole passage: no boss, small signals, and many tiny choices adding up."],
+    ["The queen bee gives orders that keep the hive running.","The passage says the hive runs \u201Cwithout a single boss\u201D and that no bee gives orders, so this contradicts it."],
+    ["Honeybees cool the hive by fanning their wings and fetching water.","This is a true detail, but it is only one example. It is too narrow to be the main idea."],
+    ["Large colonies are harder to manage than small colonies.","The passage never compares large and small colonies. This idea is not in the text."]]},
+  { skill:"VO", q:"As used in the last sentence, the word \u201Cemerge\u201D most nearly means:", o:[
+    ["come out as a result","Best answer. The decisions come out of, or result from, many small choices."],
+    ["fade away slowly","Try it in the sentence: decisions that fade away slowly does not fit the idea of choices building up."],
+    ["be argued about","Nothing in the passage suggests the bees argue. This does not fit the context."],
+    ["suddenly attack","This is a trap for readers who connect \u201Cemerge\u201D with something jumping out. The sentence is about decisions, not attacks."]]},
+  { skill:"IN", q:"Which inference is best supported by the passage?", o:[
+    ["A single bee acts without knowing the colony\u2019s overall plan.","Best answer. The last sentence says no single bee understands the decisions \u201Cin full.\u201D"],
+    ["A single bee is smarter than the colony as a whole.","The passage suggests the opposite: the colony\u2019s decisions are bigger than any one bee\u2019s understanding."],
+    ["A single bee never leaves the hive.","The passage mentions bees fetching water, which means they leave. This goes against the text."],
+    ["A single bee can run the hive if the others are removed.","The passage never says this. It is possible but not supported, so it is not a good inference."]]}
+]},
+{ id:"light", title:"Gull Point", paras:[[
+  "For thirty-one winters, Marta Ellison climbed the one hundred and twelve steps of the Gull Point lighthouse before dawn.",
+  "Her knees complained on the way up, and she complained right back, muttering about the draft and the damp and the government that had promised an elevator in 1987.",
+  "Still, each morning she polished the great lens until it threw her own tired face back at her in a hundred small pieces, and each morning she smiled at it anyway.",
+  "When the automated beacon was installed, the officials asked whether she would miss the work.",
+  "\u201CMiss it?\u201D she said, tapping the brass railing. \u201CI\u2019ll miss being needed by something that never once said thank you.\u201D"]],
+  qs:[
+  { skill:"TO", q:"Which phrase best describes the tone of the passage?", o:[
+    ["gruff but affectionate","Best answer. She complains constantly, but she smiles at the lens and says she will miss the work."],
+    ["bitter and resentful","She grumbles, but she also smiles every morning and ends by saying she will miss it. Resentful is too strong."],
+    ["cold and indifferent","Her lines show real feeling about the job, so indifferent does not fit."],
+    ["nervous and fearful","Nothing in the passage shows fear or nervousness. The mood is humorous and warm."]]},
+  { skill:"IN", q:"What does Marta most likely mean by her final statement?", o:[
+    ["She valued the work because it mattered, even without praise.","Best answer. \u201CBeing needed\u201D shows she cared about the purpose, and the joke about \u201Cthank you\u201D keeps her gruff style."],
+    ["She is angry that nobody ever thanked her.","Her tone is fond, not angry. She says she will miss the job, which is not what an angry person would say."],
+    ["She believes the automated beacon will be unsafe.","She says nothing about safety. This is an idea the passage never raises."],
+    ["She wants the officials to give her a reward.","She is not asking for anything. Her point is that being needed was enough."]]},
+  { skill:"PU", q:"Why does the author mention the elevator promised in 1987?", o:[
+    ["To add humor and show Marta\u2019s gruff personality","Best answer. The complaint about a broken promise is funny and shows how she talks."],
+    ["To prove that the government built a new elevator","The passage says the elevator was only promised. It never says one was built."],
+    ["To explain how lighthouses work","The detail has nothing to do with how a lighthouse works. It is about Marta\u2019s attitude."],
+    ["To show that Marta quit because of the stairs","She did not quit. The beacon was automated. The stairs are a source of complaints, not a reason she left."]]}
+]},
+{ id:"sleep", title:"Early Bells", paras:[[
+  "Many high schools start classes before 8:00 a.m., but researchers who study teenage sleep say that schedule works against biology.",
+  "During adolescence, the body\u2019s internal clock shifts later, making it hard for most teens to fall asleep before 11:00 p.m.",
+  "A student who rises at 6:00 a.m. may therefore get only six hours of rest, well below the eight to ten hours doctors recommend.",
+  "In districts that moved start times to 8:30 or later, studies reported fewer late arrivals and fewer car accidents involving teen drivers.",
+  "Critics point out that later schedules complicate bus routes and after-school sports.",
+  "Those concerns are real, but they are problems of logistics, while sleep loss affects students\u2019 health every single day."]],
+  qs:[
+  { skill:"PU", q:"What is the author\u2019s main purpose in this passage?", o:[
+    ["To argue that high schools should start later in the morning","Best answer. The author gives a problem, evidence, and a response to critics, all supporting later start times."],
+    ["To explain how school bus routes are planned","Bus routes appear only as a concern from critics. This is too narrow."],
+    ["To describe how the body\u2019s internal clock works","The clock is one reason the author gives, but the passage goes on to argue for a change."],
+    ["To tell an entertaining story about a teenager\u2019s morning","There is no story or character. The passage is an argument."]]},
+  { skill:"CE", q:"Which detail is the best evidence that later start times help students?", o:[
+    ["Districts that moved to 8:30 or later saw fewer late arrivals and fewer teen driving accidents.","Best answer. It reports actual results after the change was made."],
+    ["The body\u2019s internal clock shifts later during adolescence.","This explains why early starts are a problem, but it is not a result of changing the schedule."],
+    ["Doctors recommend eight to ten hours of sleep.","This is a standard, not proof that later start times work."],
+    ["Later schedules complicate bus routes and sports.","This is the critics\u2019 point against later start times, not evidence for them."]]},
+  { skill:"TS", q:"How does the author handle the critics\u2019 concerns in the last two sentences?", o:[
+    ["Admits they are real, then argues that health matters more","Best answer. \u201CThose concerns are real, but\u2026\u201D grants the point and then gives a stronger reason."],
+    ["Ignores them completely","The author names the concerns directly, so they are not ignored."],
+    ["Agrees that later start times should be dropped","The author keeps supporting later start times. The word \u201Cbut\u201D shows the author is not giving up."],
+    ["Makes fun of the critics","The tone stays serious and fair. There is no mocking."]]}
+]},
+{ id:"kick", title:"Behind the Library", paras:[[
+  "Dev had practiced the kickflip for three weeks, and for three weeks the board had spun away from him like a startled cat.",
+  "Today, behind the library, his cousin Anil watched from the curb, saying nothing, which was somehow worse than advice.",
+  "Dev set his feet, breathed in, and flicked his ankle.",
+  "The board rose, turned once beneath him, and landed with a clean, wooden clack.",
+  "For a second he forgot to celebrate.",
+  "He only stood there, wobbling slightly, as though the ground might take it back.",
+  "Then Anil whistled, long and low, and Dev finally let himself grin."]],
+  qs:[
+  { skill:"FL", q:"The comparison to \u201Ca startled cat\u201D suggests that the board was:", o:[
+    ["sudden and hard to control","Best answer. A startled cat bolts without warning, just like the board shot away from Dev."],
+    ["friendly and easy to handle","A startled cat is the opposite of calm and easy to handle."],
+    ["soft and gentle","The comparison is about sudden movement, not softness."],
+    ["a living animal","This is a simile. It compares the board to a cat, but the board is not literally alive."]]},
+  { skill:"IN", q:"Why did Dev \u201Cforget to celebrate\u201D after landing the trick?", o:[
+    ["He was stunned that it finally worked.","Best answer. He just stands there wobbling \u201Cas though the ground might take it back,\u201D which shows disbelief."],
+    ["He was disappointed with how it looked.","The landing is described as \u201Cclean,\u201D and he grins later. Disappointment does not fit."],
+    ["He did not notice Anil watching.","Anil\u2019s whistle makes Dev grin, so he is aware of him. Nothing suggests he missed Anil."],
+    ["He hurt his ankle during the landing.","The text says he wobbled slightly, not that he was hurt."]]},
+  { skill:"IN", q:"Why was Anil\u2019s silence \u201Csomehow worse than advice\u201D?", o:[
+    ["Being watched without any guidance made Dev feel more pressure.","Best answer. Silent watching leaves Dev alone with the expectation that he should succeed."],
+    ["Anil did not care whether Dev succeeded.","Anil whistles when Dev lands it, which shows he cares."],
+    ["Anil was secretly angry with Dev.","Nothing in the text points to anger. This is a guess with no support."],
+    ["Dev wanted Anil to leave so he could practice alone.","Dev grins at Anil\u2019s whistle at the end, so he is glad Anil is there. This does not match the text."]]}
+]},
+{ id:"paper", title:"Page or Screen?", paras:[[
+  "Readers who prefer paper books often say they remember more of what they read.",
+  "Some studies back them up: when people read long passages on paper, they tend to score slightly higher on comprehension questions than when they read the same passages on a screen."],[
+  "Digital readers, however, point to advantages that paper cannot match.",
+  "A single tablet can carry hundreds of books, text can be enlarged for tired eyes, and a dictionary is only a tap away."],[
+  "In the end, the better format may depend on the task.",
+  "A quick article before bed might suit a phone, while a dense textbook chapter may be easier to absorb with a pencil and a printed page."]],
+  qs:[
+  { skill:"TS", q:"How is the passage mainly organized?", o:[
+    ["It compares two options and ends with a balanced conclusion.","Best answer. Paragraph 1 covers paper, paragraph 2 covers digital, and paragraph 3 weighs both."],
+    ["It lists events in the order they happened.","There is no timeline or sequence of events."],
+    ["It describes a problem and then a single solution.","The passage does not frame paper or screens as a problem needing one fix."],
+    ["It explains a cause and then its effects.","The passage does not trace causes and effects. It compares two formats."]]},
+  { skill:"DT", q:"According to the passage, which is an advantage of digital reading?", o:[
+    ["A dictionary is available with a tap.","Best answer. This is stated directly in the second paragraph."],
+    ["Readers score higher on comprehension questions.","The passage says this about paper, not screens."],
+    ["Readers can write notes with a pencil.","The pencil is mentioned in connection with a printed page."],
+    ["The device never needs a charge.","The passage says nothing about battery life. Do not add facts that are not in the text."]]},
+  { skill:"IN", q:"Which statement would the author most likely agree with?", o:[
+    ["Neither format is best for every reading situation.","Best answer. The last paragraph says the better choice \u201Cmay depend on the task.\u201D"],
+    ["Paper books should replace screens in all schools.","The author gives real advantages for screens, so this is too extreme."],
+    ["Screens are always better because they hold more books.","The author also gives evidence in favor of paper. \u201CAlways\u201D goes beyond the passage."],
+    ["Reading on a phone is never a good idea.","The author says a phone might suit a quick article before bed."]]}
+]},
+{ id:"roof", title:"Gardens in the Sky", paras:[[
+  "When rain falls on a city, it has nowhere to go.",
+  "Asphalt and concrete block the water from soaking into the ground, so it rushes into storm drains, often carrying oil and trash into nearby rivers.",
+  "Rooftop gardens offer a partial remedy.",
+  "Their soil and plants absorb a large share of the rainfall, releasing it slowly or returning it to the air through evaporation.",
+  "The gardens also shade the roof below, which can lower a building\u2019s cooling costs in summer.",
+  "Installing one is expensive, however, and many building owners hesitate to take on the upfront cost."]],
+  qs:[
+  { skill:"DT", q:"According to the passage, why does rainwater rush into storm drains in cities?", o:[
+    ["Hard surfaces keep the water from soaking into the ground.","Best answer. The second sentence says asphalt and concrete block the water."],
+    ["Rooftop gardens push the water off buildings.","Rooftop gardens do the opposite. They absorb water."],
+    ["Rivers are already too full to take in rain.","The passage never says this. Rivers are only mentioned as where the water ends up."],
+    ["Oil makes the water heavier and faster.","Oil is mentioned as something the water carries, not as the reason it rushes."]]},
+  { skill:"VO", q:"As used in the passage, the word \u201Cremedy\u201D most nearly means:", o:[
+    ["a way to fix a problem","Best answer. Rooftop gardens help solve the water runoff problem."],
+    ["a medicine for an illness","This is the most common meaning of the word, but the passage is about rainwater, not sickness. Always check context."],
+    ["a type of building material","Nothing in the sentence is about building materials."],
+    ["a rule for building owners","The passage does not describe any rule. Owners are only described as hesitating."]]},
+  { skill:"MI", q:"Which statement best summarizes the passage?", o:[
+    ["Rooftop gardens can reduce city runoff and cooling costs, but they are costly to install.","Best answer. It includes the problem, the benefits, and the drawback."],
+    ["Cities should stop using asphalt and concrete.","The passage never recommends this. It offers rooftop gardens as a partial fix."],
+    ["Rooftop gardens are too expensive to be worth building.","This overstates the drawback. The passage says owners hesitate, not that gardens are not worth it."],
+    ["Rain causes pollution in rivers.","This is only one detail, and the passage blames hard surfaces, not rain itself."]]}
+]},
+{ id:"dust", title:"The Dust Bowl", paras:[[
+  "In the 1930s, a severe drought struck the southern Great Plains.",
+  "The land might have survived the dry years if farmers had not already plowed up millions of acres of native prairie grass, whose deep roots had held the soil in place for centuries.",
+  "Without that grass, the dry topsoil turned to dust, and powerful winds lifted it into enormous black clouds that buried fences, choked livestock, and sent thousands of families searching for work elsewhere.",
+  "In response, the government encouraged farmers to plant trees as windbreaks and to plow in patterns that slowed erosion."]],
+  qs:[
+  { skill:"MI", q:"Which sentence best summarizes the passage?", o:[
+    ["Drought and the loss of prairie grass caused destructive dust storms, which led to new farming practices.","Best answer. It connects the cause, the effect, and the response."],
+    ["Farmers in the 1930s did not work hard enough.","The passage never blames laziness. It blames plowing up the grass combined with drought."],
+    ["The government planted every tree on the Great Plains.","The government only encouraged farmers to plant trees. \u201CEvery tree\u201D is far too strong."],
+    ["Dust storms are common in all dry regions.","The passage is about one place and time, not all dry regions."]]},
+  { skill:"IN", q:"What can the reader conclude from the second sentence?", o:[
+    ["Human choices made the effects of the drought worse.","Best answer. \u201CMight have survived if farmers had not plowed\u201D shows the plowing added to the damage."],
+    ["The drought was not a serious problem.","The passage calls the drought severe."],
+    ["Prairie grass cannot grow in dry weather.","The passage says its deep roots held soil in place for centuries, including through dry times."],
+    ["Farmers plowed the grass because of the drought.","The text says the grass was plowed up before the dry years, so the plowing was not caused by the drought."]]},
+  { skill:"TS", q:"Which text structure does the passage mainly use?", o:[
+    ["cause and effect","Best answer. It shows what caused the dust storms, what the storms did, and how the government responded."],
+    ["compare and contrast","Nothing is being compared to anything else."],
+    ["description of a place","The passage describes events and results, not what the place looks like."],
+    ["a list of steps in a process","There is no step-by-step process the reader is meant to follow."]]}
+]},
+{ id:"v1", vocab:true, title:"Words in context", paras:[[
+  "The senator\u2019s speech was so lengthy and repetitive that even her supporters began to fidget; it was, in short, tedious."]],
+  qs:[{ skill:"VO", q:"In this sentence, \u201Ctedious\u201D most nearly means:", o:[
+    ["boring and tiresome","Best answer. The speech was long and repetitive, and people fidgeted."],
+    ["exciting and fast","Fidgeting audiences are not excited, and \u201Clengthy\u201D is the opposite of fast."],
+    ["confusing and unclear","The sentence is about length and repetition, not confusion."],
+    ["offensive and rude","Nothing suggests the speech insulted anyone."]]}]},
+{ id:"v2", vocab:true, title:"Words in context", paras:[[
+  "Although the twins looked identical, their personalities were quite distinct: one loved crowds, the other craved quiet."]],
+  qs:[{ skill:"VO", q:"In this sentence, \u201Cdistinct\u201D most nearly means:", o:[
+    ["clearly different","Best answer. The colon introduces the difference: crowds versus quiet."],
+    ["exactly alike","The word \u201CAlthough\u201D signals a contrast with looking identical."],
+    ["hard to notice","The sentence gives clear examples, so the difference is easy to notice."],
+    ["polite and gentle","The sentence is about being different, not about manners."]]}]},
+{ id:"v3", vocab:true, title:"Words in context", paras:[[
+  "The hikers decided to conserve their water, taking only small sips until they reached the next stream."]],
+  qs:[{ skill:"VO", q:"In this sentence, \u201Cconserve\u201D most nearly means:", o:[
+    ["use carefully to make it last","Best answer. They take small sips so the water lasts until the stream."],
+    ["pour out quickly","Taking small sips is the opposite of pouring water out."],
+    ["clean and purify","The sentence is about how much they drink, not about cleaning it."],
+    ["give away to others","Nothing in the sentence says they share the water."]]}]},
+{ id:"v4", vocab:true, title:"Words in context", paras:[[
+  "Her explanation was so lucid that even the youngest students understood the experiment immediately."]],
+  qs:[{ skill:"VO", q:"In this sentence, \u201Clucid\u201D most nearly means:", o:[
+    ["clear and easy to follow","Best answer. Even the youngest students understood right away."],
+    ["long and detailed","Length is not mentioned, and understanding \u201Cimmediately\u201D suggests it was simple."],
+    ["loud and energetic","The sentence says nothing about volume or energy."],
+    ["complicated and technical","If it were complicated, young students would not understand it immediately."]]}]},
+{ id:"v5", vocab:true, title:"Words in context", paras:[[
+  "The coach\u2019s praise was genuine; he never complimented a player unless he meant it."]],
+  qs:[{ skill:"VO", q:"In this sentence, \u201Cgenuine\u201D most nearly means:", o:[
+    ["sincere and real","Best answer. The second half explains it: he only complimented when he meant it."],
+    ["exaggerated","Exaggerated praise would not be something he \u201Cmeant.\u201D"],
+    ["rare","This is tempting because he praised carefully, but the word describes whether the praise was honest, not how often it happened."],
+    ["accidental","He praised on purpose, only when he meant it."]]}]}
+];
+
+/* ---------- Setup ---------- */
+var ALL = [];
+PASSAGES.forEach(function(p){ p.qs.forEach(function(q,n){ q.id=p.id+"-"+n; q.pass=p; ALL.push(q); }); });
+var BY_ID = {}; ALL.forEach(function(q){ BY_ID[q.id]=q; });
+var LETTERS = ["A","B","C","D"];
+var RANKS = [[0,"Rookie reader"],[10,"Page turner"],[30,"Bookworm"],[60,"Sharp reader"],[100,"Reading ace"]];
+
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+/* ---------- Storage (guarded) ---------- */
+var KEY="pert-reading-rally-v1";
+function loadStore(){
+  try{ var raw=localStorage.getItem(KEY); if(raw){ var s=JSON.parse(raw); if(s&&s.stats) return s; } }catch(e){}
+  return {stats:{}, missed:[], best:0, correct:0, answered:0};
+}
+function saveStore(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
+var store = loadStore();
+
+/* ---------- State ---------- */
+var S = { screen:"home", queue:[], i:0, order:null, picked:null, results:[], streak:0, hl:{}, mode:"" };
+
+function rankName(){
+  var n=store.correct, r=RANKS[0][1];
+  RANKS.forEach(function(x){ if(n>=x[0]) r=x[1]; });
+  return r;
+}
+
+function startRound(mode, arg){
+  var ids=[];
+  if(mode==="quick"){
+    var full=shuffle(PASSAGES.filter(function(p){return !p.vocab;})).slice(0,3);
+    var vocab=shuffle(PASSAGES.filter(function(p){return p.vocab;})).slice(0,2);
+    full.concat(vocab).forEach(function(p){ p.qs.forEach(function(q){ ids.push(q.id); }); });
+  } else if(mode==="skill"){
+    ids=shuffle(ALL.filter(function(q){return q.skill===arg;})).slice(0,8).map(function(q){return q.id;});
+  } else if(mode==="missed"){
+    ids=shuffle((arg||store.missed).filter(function(id){return BY_ID[id];}));
+  } else if(mode==="all"){
+    ids=ALL.map(function(q){return q.id;});
+  }
+  if(!ids.length) return;
+  S={ screen:"quiz", queue:ids, i:0, order:null, picked:null, results:[], streak:0, hl:{}, mode:mode };
+  render(); window.scrollTo(0,0);
+}
+
+function pick(idx){
+  if(S.picked!==null) return;
+  var q=BY_ID[S.queue[S.i]];
+  var opt=S.order[idx];
+  var ok=(opt.i===0);
+  S.picked=idx;
+  S.results.push({id:q.id, ok:ok, chosen:opt.t});
+  var st=store.stats[q.skill]||[0,0];
+  st[1]++; store.answered++;
+  if(ok){ st[0]++; store.correct++; S.streak++; if(S.streak>store.best) store.best=S.streak;
+    store.missed=store.missed.filter(function(id){return id!==q.id;}); }
+  else { S.streak=0; if(store.missed.indexOf(q.id)<0) store.missed.push(q.id); }
+  store.stats[q.skill]=st;
+  saveStore();
+  render();
+  var v=document.getElementById("verdict"); if(v) v.scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+
+function next(){
+  if(S.i+1>=S.queue.length){ S.screen="results"; }
+  else { S.i++; S.picked=null; S.order=null; }
+  render(); window.scrollTo(0,0);
+}
+
+/* ---------- Views ---------- */
+var app=document.getElementById("app");
+
+function passageHTML(q){
+  var p=q.pass, html='<section class="page" aria-label="Reading passage"><h3>'+p.title+'</h3><p class="hint">Tap any sentence to highlight it.</p>';
+  p.paras.forEach(function(para,pi){
+    html+='<p class="para">';
+    para.forEach(function(sent,si){
+      var k=p.id+":"+pi+":"+si;
+      html+='<span class="s'+(S.hl[k]?" on":"")+'" data-hl="'+k+'" role="button" tabindex="0" aria-pressed="'+(S.hl[k]?"true":"false")+'">'+sent+'</span> ';
+    });
+    html+='</p>';
+  });
+  return html+'</section>';
+}
+
+function homeView(){
+  var h='<p class="brand">Natasha’s PERT Reading Rally</p>';
+  h+='<h1>Pick the answer. <span class="mark">Learn why</span> the others fail.</h1>';
+  h+='<p class="lede">Welcome back, Natasha. Short passages, four choices, and a reason behind every single one, right or wrong.</p>';
+  h+='<span class="goal">Goal: 103 or higher</span>';
+  h+='<div class="modes">';
+  h+='<button class="mode primary" data-act="quick"><b>Quick round</b><span>11 questions from a mix of passages and word-in-context items</span></button>';
+  h+='<button class="mode" data-act="missed"'+(store.missed.length?'':' disabled')+'><b>Retry missed</b><span>'+(store.missed.length?store.missed.length+' question'+(store.missed.length===1?'':'s')+' waiting':'Nothing missed yet')+'</span></button>';
+  h+='<button class="mode" data-act="all"><b>Full set</b><span>All '+ALL.length+' questions in order</span></button>';
+  h+='</div>';
+  h+='<h2>Train one skill</h2><div class="skills">';
+  Object.keys(SK).forEach(function(k){
+    var n=ALL.filter(function(q){return q.skill===k;}).length;
+    if(!n) return;
+    var st=store.stats[k]||[0,0], pc=st[1]?Math.round(st[0]/st[1]*100):0;
+    h+='<button class="skill" data-act="skill" data-k="'+k+'"><span class="nm">'+SK[k]+'</span><span class="pc">'+(st[1]?pc+"% of "+st[1]:"not tried")+'</span><span class="bar"><i style="width:'+pc+'%"></i></span></button>';
+  });
+  h+='</div>';
+  h+='<div class="stats"><div class="stat"><b>'+rankName()+'</b><span>Current rank</span></div><div class="stat"><b>'+store.correct+'</b><span>Correct answers</span></div><div class="stat"><b>'+store.best+'</b><span>Best streak</span></div></div>';
+  h+='<p class="fine">Practice accuracy is not a PERT score. Use it to find weak spots, then work on those skills. Progress is saved on this device.</p>';
+  h+='<p><button class="link" data-act="reset">Reset my progress</button></p>';
+  return h;
+}
+
+function quizView(){
+  var q=BY_ID[S.queue[S.i]];
+  if(!S.order) S.order=shuffle(q.o.map(function(x,i){return {t:x[0],w:x[1],i:i};}));
+  var done=S.picked!==null, total=S.queue.length;
+  var h='<div class="top"><button class="exit" data-act="home">Exit</button><div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+(S.i+(done?1:0))+'"><i style="width:'+((S.i+(done?1:0))/total*100)+'%"></i></div><span class="cnt">'+(S.i+1)+' of '+total+'</span>'+(S.streak>=2?'<span class="streak">'+S.streak+' in a row</span>':'')+'</div>';
+  h+=passageHTML(q);
+  h+='<span class="tag">'+SK[q.skill]+'</span><p class="q">'+q.q+'</p><div class="opts">';
+  S.order.forEach(function(o,idx){
+    var cls="opt", why="";
+    if(done){
+      if(o.i===0){ cls+=" right"; }
+      else if(idx===S.picked){ cls+=" wrong"; }
+      else { cls+=" dim"; }
+      var lead = o.i===0 ? "" : (idx===S.picked ? "<b>Your pick. </b>" : "");
+      why='<span class="why">'+lead+o.w+'</span>';
+    }
+    h+='<button class="'+cls+'" data-pick="'+idx+'"'+(done?' disabled':'')+'><span class="ltr">'+LETTERS[idx]+'</span><span>'+o.t+'</span>'+why+'</button>';
+  });
+  h+='</div>';
+  if(done){
+    var ok=S.order[S.picked].i===0;
+    h+='<div id="verdict" class="verdict '+(ok?'ok':'no')+'">'+(ok?'Correct. Nice reading, Natasha.':'Not quite. Read the reason under each choice, especially yours.')+'</div>';
+    if(!ok) h+='<div class="strategy"><b>Strategy for '+SK[q.skill].toLowerCase()+': </b>'+TIPS[q.skill]+'</div>';
+    h+='<button class="cta" data-act="next">'+(S.i+1>=total?'See results':'Next question')+'</button>';
+  }
+  return h;
+}
+
+function resultsView(){
+  var n=S.results.length, c=S.results.filter(function(r){return r.ok;}).length, pc=Math.round(c/n*100);
+  var msg = pc>=90?"Excellent work, Natasha. Keep that careful reading going.":pc>=70?"Solid round, Natasha. The missed ones below are your best study material.":pc>=50?"Getting there, Natasha. Read the reasons for the missed questions, then try again.":"Tough round, Natasha, and that is useful. Every miss shows exactly what to practice next.";
+  var h='<p class="brand">Round complete</p><div class="big">'+c+'/'+n+'</div><p class="lede">'+msg+'</p>';
+  var by={}; S.results.forEach(function(r){ var k=BY_ID[r.id].skill; by[k]=by[k]||[0,0]; by[k][1]++; if(r.ok) by[k][0]++; });
+  h+='<h2>By skill</h2>';
+  Object.keys(by).forEach(function(k){
+    var p=Math.round(by[k][0]/by[k][1]*100);
+    h+='<div class="row"><span class="nm" style="font-weight:700">'+SK[k]+'</span><span class="pc" style="color:var(--muted);font-size:14px">'+by[k][0]+' of '+by[k][1]+'</span><span class="bar" style="grid-column:1/-1;margin-top:0"><i style="width:'+p+'%"></i></span></div>';
+  });
+  var miss=S.results.filter(function(r){return !r.ok;});
+  if(miss.length){
+    h+='<h2 style="margin-top:22px">Questions to revisit</h2>';
+    miss.forEach(function(r){
+      var q=BY_ID[r.id];
+      h+='<div class="rev"><p class="rq">'+q.q+'</p><p class="ra">You chose: '+r.chosen+'<br><b>Best answer: '+q.o[0][0]+'</b></p></div>';
+    });
+    h+='<button class="cta" data-act="retryRound">Retry these '+miss.length+'</button>';
+  }
+  h+='<button class="cta'+(miss.length?' alt':'')+'" data-act="quick">Start a new quick round</button>';
+  h+='<button class="cta alt" data-act="home">Back to home</button>';
+  return h;
+}
+
+function render(){
+  app.innerHTML = S.screen==="home" ? homeView() : S.screen==="quiz" ? quizView() : resultsView();
+}
+
+/* ---------- Events ---------- */
+function toggleHL(el){
+  var k=el.getAttribute("data-hl"); S.hl[k]=!S.hl[k];
+  el.classList.toggle("on",!!S.hl[k]); el.setAttribute("aria-pressed",S.hl[k]?"true":"false");
+}
+app.addEventListener("click",function(e){
+  var t=e.target;
+  var hl=t.closest("[data-hl]"); if(hl){ toggleHL(hl); return; }
+  var pk=t.closest("[data-pick]"); if(pk){ pick(parseInt(pk.getAttribute("data-pick"),10)); return; }
+  var a=t.closest("[data-act]"); if(!a||a.disabled) return;
+  var act=a.getAttribute("data-act");
+  if(act==="quick") startRound("quick");
+  else if(act==="all") startRound("all");
+  else if(act==="missed") startRound("missed");
+  else if(act==="skill") startRound("skill",a.getAttribute("data-k"));
+  else if(act==="next") next();
+  else if(act==="home"){ S={screen:"home",queue:[],i:0,order:null,picked:null,results:[],streak:0,hl:{},mode:""}; render(); window.scrollTo(0,0); }
+  else if(act==="retryRound"){ startRound("missed", S.results.filter(function(r){return !r.ok;}).map(function(r){return r.id;})); }
+  else if(act==="reset"){ if(window.confirm("Reset all saved progress on this device?")){ store={stats:{},missed:[],best:0,correct:0,answered:0}; saveStore(); render(); } }
+});
+app.addEventListener("keydown",function(e){
+  if((e.key==="Enter"||e.key===" ") && e.target.matches && e.target.matches("[data-hl]")){ e.preventDefault(); toggleHL(e.target); }
+});
+
+render();
+</script>
+</body>
+</html>
