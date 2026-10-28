@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AP CSP Practice Questions</title>
+<style>
+  :root {
+    --bg: #FBF6F6; --surface: #FFFFFF; --ink: #2B1F21; --muted: #685759; --line: #E4D4D6;
+    --brand: #DD0426; --brand-ink: #FFFFFF; --brand-soft: #FCE8EB;
+    --ok: #17663F; --ok-soft: #E2F2E9; --bad: #B0001D; --bad-soft: #FDEBEE;
+    --focus: #1B4DB8;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1A1315; --surface: #251B1E; --ink: #F4EAEB; --muted: #C2AEB1; --line: #3D2D31;
+      --brand: #FF5068; --brand-ink: #1A1315; --brand-soft: #3A1B22;
+      --ok: #7CDBA9; --ok-soft: #173226; --bad: #FF8A9B; --bad-soft: #3A1820;
+      --focus: #8FB2FF;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1A1315; --surface: #251B1E; --ink: #F4EAEB; --muted: #C2AEB1; --line: #3D2D31;
+    --brand: #FF5068; --brand-ink: #1A1315; --brand-soft: #3A1B22;
+    --ok: #7CDBA9; --ok-soft: #173226; --bad: #FF8A9B; --bad-soft: #3A1820;
+    --focus: #8FB2FF;
+    color-scheme: dark;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); background: var(--bg); }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Avenir Next", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px; line-height: 1.5; -webkit-text-size-adjust: 100%;
+  }
+  .rule { height: 6px; background: var(--brand); }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 28px 22px 64px; }
+  header.top { margin-bottom: 28px; }
+  .overline { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: var(--brand); margin: 0 0 6px; }
+  h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.05; letter-spacing: -.02em; margin: 0 0 10px; font-weight: 800; }
+  .lede { margin: 0; color: var(--muted); max-width: 60ch; }
+  h2 { font-size: 20px; margin: 0 0 6px; letter-spacing: -.005em; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  [hidden] { display: none !important; }
+
+  /* ---------- setup */
+  .setup { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; align-items: start; }
+  .group { margin-bottom: 22px; }
+  .group h3 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; padding-bottom: 6px; border-bottom: 2px solid var(--line); }
+  .topic { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 52px; padding: 10px 6px; background: none; border: 0; border-bottom: 1px solid var(--line); text-align: left; cursor: pointer; }
+  .topic:hover { background: var(--brand-soft); }
+  .box { flex: none; width: 24px; height: 24px; border: 2px solid var(--muted); border-radius: 5px; display: grid; place-items: center; background: var(--surface); }
+  .topic[aria-checked="true"] .box { background: var(--brand); border-color: var(--brand); }
+  .box svg { width: 15px; height: 15px; stroke: var(--brand-ink); stroke-width: 3; fill: none; opacity: 0; }
+  .topic[aria-checked="true"] .box svg { opacity: 1; }
+  .tname { flex: 1; min-width: 0; }
+  .tcount { flex: none; color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; margin-left: 8px; border: 1.5px solid var(--muted); border-radius: 999px; color: var(--muted); vertical-align: middle; }
+  .links { display: flex; gap: 18px; margin: 0 0 18px; }
+  .linkbtn { background: none; border: 0; padding: 4px 0; color: var(--brand); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  aside.panel { position: sticky; top: 16px; border: 2px solid var(--ink); border-radius: 14px; padding: 22px; background: var(--surface); }
+  .avail { font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -.02em; margin: 8px 0 2px; font-variant-numeric: tabular-nums; }
+  .availlbl { color: var(--muted); margin: 0 0 20px; }
+  .seg { display: flex; border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; margin: 8px 0 22px; }
+  .seg button { flex: 1; min-height: 46px; background: var(--surface); border: 0; border-right: 2px solid var(--ink); cursor: pointer; font-weight: 700; }
+  .seg button:last-child { border-right: 0; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  .primary { width: 100%; min-height: 54px; border: 0; border-radius: 10px; background: var(--brand); color: var(--brand-ink); font-weight: 800; font-size: 18px; cursor: pointer; }
+  .primary:hover { filter: brightness(.93); }
+  .primary:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+  .secondary { min-height: 50px; padding: 0 22px; border: 2px solid var(--ink); border-radius: 10px; background: transparent; font-weight: 700; cursor: pointer; }
+  .secondary:hover { background: var(--brand-soft); }
+  .note { font-size: 15px; color: var(--muted); margin: 14px 0 0; }
+
+  /* ---------- quiz */
+  .bar { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bar .right { color: var(--muted); font-weight: 600; }
+  .track { height: 8px; background: var(--line); border-radius: 99px; margin: 10px 0 26px; overflow: hidden; }
+  .fill { height: 100%; background: var(--brand); width: 0; transition: width .25s ease-out; }
+  .qtopic { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin: 0 0 8px; }
+  .question { font-size: clamp(21px, 3.6vw, 27px); line-height: 1.3; font-weight: 700; letter-spacing: -.01em; margin: 0 0 24px; max-width: 34em; }
+  .opts { display: grid; gap: 12px; max-width: 760px; }
+  .opt { display: flex; gap: 16px; align-items: flex-start; width: 100%; text-align: left; padding: 14px 18px; min-height: 60px; background: var(--surface); border: 2px solid var(--line); border-radius: 12px; cursor: pointer; transition: border-color .12s, background .12s; }
+  .opt:hover { border-color: var(--ink); }
+  .bubble { flex: none; width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 15px; margin-top: 1px; background: var(--surface); }
+  .otext { padding-top: 4px; min-width: 0; overflow-wrap: anywhere; }
+  .opt.locked { cursor: default; }
+  .opt.locked:hover { border-color: var(--line); }
+  .opt.correct { border-color: var(--ok); background: var(--ok-soft); }
+  .opt.correct .bubble { background: var(--ok); border-color: var(--ok); color: var(--bg); }
+  .opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+  .opt.wrong .bubble { background: var(--bad); border-color: var(--bad); color: var(--bg); }
+  .opt.dim { opacity: .62; }
+  .mark { margin-left: auto; flex: none; font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding-top: 7px; }
+  .opt.correct .mark { color: var(--ok); }
+  .opt.wrong .mark { color: var(--bad); }
+  .fb { max-width: 760px; margin-top: 22px; padding: 18px 20px; border-left: 6px solid var(--line); background: var(--surface); border-radius: 0 12px 12px 0; }
+  .fb.good { border-left-color: var(--ok); }
+  .fb.miss { border-left-color: var(--bad); }
+  .fb h2 { margin-bottom: 8px; }
+  .fb.good h2 { color: var(--ok); }
+  .fb.miss h2 { color: var(--bad); }
+  .fb p { margin: 0 0 10px; }
+  .fb p:last-child { margin-bottom: 0; }
+  .fb strong { font-weight: 800; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; align-items: center; }
+  .actions .primary { width: auto; padding: 0 34px; }
+  .hint { color: var(--muted); font-size: 15px; }
+
+  /* ---------- results */
+  .score { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 6px 0 4px; }
+  .big { font-size: clamp(56px, 12vw, 96px); font-weight: 800; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .of { font-size: 24px; color: var(--muted); font-weight: 700; }
+  .msg { font-size: 22px; font-weight: 700; margin: 0 0 28px; max-width: 30em; }
+  .tb { width: 100%; max-width: 760px; border-collapse: collapse; margin: 8px 0 30px; }
+  .tb th { text-align: left; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 8px 8px 8px 0; border-bottom: 2px solid var(--line); }
+  .tb td { padding: 12px 8px 12px 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .tb td.num { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .mini { height: 8px; background: var(--line); border-radius: 99px; min-width: 70px; overflow: hidden; }
+  .mini span { display: block; height: 100%; background: var(--brand); }
+  details.miss { max-width: 760px; border-bottom: 1px solid var(--line); padding: 4px 0; }
+  details.miss summary { cursor: pointer; padding: 12px 4px; font-weight: 700; list-style-position: outside; }
+  details.miss .body { padding: 0 4px 16px 4px; }
+  details.miss .body p { margin: 0 0 8px; }
+  .perfect { max-width: 760px; padding: 16px 20px; border-left: 6px solid var(--ok); background: var(--surface); border-radius: 0 12px 12px 0; margin-bottom: 24px; font-weight: 700; }
+
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 800px) {
+    .setup { grid-template-columns: 1fr; gap: 8px; }
+    aside.panel { position: static; margin-top: 8px; }
+    body { font-size: 17px; }
+    .wrap { padding: 22px 16px 56px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .fill, .opt { transition: none; } }
+</style>
+</head>
+<body>
+<div class="rule"></div>
+<div class="wrap">
+  <header class="top">
+    <p class="overline">Crimson Global Academy</p>
+    <h1>AP CSP Practice Questions</h1>
+    <p class="lede" id="lede">Pick your topics, answer AP-style multiple-choice questions, and get an explanation after every answer, including why each wrong choice is wrong.</p>
+  </header>
+
+  <main id="app"></main>
+
+  <footer>AP Computer Science Principles. Practice questions for review. Topics: Big Ideas 2, 4, and 5.</footer>
+</div>
+
+<script>
+const TOPICS = [
+  { id: "bin",   name: "Binary Numbers",                              group: "Big Idea 2: Data" },
+  { id: "hex",   name: "Hexadecimal and Colors",                      group: "Big Idea 2: Data" },
+  { id: "rep",   name: "Representing Data (bits, images, overflow)",  group: "Big Idea 2: Data" },
+  { id: "comp",  name: "Data Compression",                            group: "Big Idea 2: Data" },
+  { id: "imp",   name: "Beneficial and Harmful Effects, Digital Divide", group: "Big Idea 5: Impact of Computing" },
+  { id: "bias",  name: "Computing Bias and Crowdsourcing",            group: "Big Idea 5: Impact of Computing" },
+  { id: "legal", name: "Legal, Ethical, and Safe Computing",          group: "Big Idea 5: Impact of Computing" },
+  { id: "dns",   name: "Domain Names and IP Addresses",               group: "Big Idea 4: Computer Systems and Networks" },
+  { id: "pkt",   name: "Routers, Packets, and Protocols",             group: "Big Idea 4: Computer Systems and Networks" },
+  { id: "fault", name: "Fault Tolerance",                             group: "Big Idea 4: Computer Systems and Networks" },
+  { id: "par",   name: "Parallel and Distributed Computing",          group: "Big Idea 4: Computer Systems and Networks" },
+  { id: "https", name: "HTTPS, Certificates, and Keys",               group: "Big Idea 4: Computer Systems and Networks", preview: true }
+];
+
+// Each option is [text, whyWrong]. The correct option has an empty whyWrong string.
+const QUESTIONS = [
+  // ---------- Binary Numbers
+  { t: "bin", q: "What is the decimal value of the binary number 1011?",
+    o: [["9", "Binary 1001 is 9. Check each place value for 1011: 8 + 0 + 2 + 1."], ["11", ""], ["13", "Binary 1101 is 13. The bits of 1011 stand for 8, 0, 2, and 1."], ["15", "Binary 1111 is 15, which has every bit set to 1."]],
+    e: "The place values are 8, 4, 2, and 1. The bits 1011 mean 8 + 0 + 2 + 1 = 11." },
+  { t: "bin", q: "Which binary number is equal to the decimal number 13?",
+    o: [["1011", "1011 equals 8 + 2 + 1 = 11."], ["1101", ""], ["1110", "1110 equals 8 + 4 + 2 = 14."], ["1001", "1001 equals 8 + 1 = 9."]],
+    e: "13 = 8 + 4 + 1. The 8s, 4s, and 1s bits are on and the 2s bit is off, so the number is 1101." },
+  { t: "bin", q: "How many different values can be represented using exactly 5 bits?",
+    o: [["10", "That adds 5 + 5. Each bit doubles the number of values, so you multiply by 2 for every bit."], ["25", "That is 5 × 5. Each added bit doubles the count, so use 2 raised to the number of bits."], ["32", ""], ["64", "That is 2⁶, the number of values for 6 bits."]],
+    e: "With n bits you can represent 2ⁿ different values. For 5 bits, 2⁵ = 32 values (0 through 31)." },
+  { t: "bin", q: "A program needs to give a unique binary code to each of 40 different items. What is the minimum number of bits needed?",
+    o: [["5", "5 bits give only 2⁵ = 32 codes, which is not enough for 40 items."], ["6", ""], ["20", "You do not need that many. Each added bit doubles the number of codes."], ["40", "One bit per item is not needed. With 6 bits you already have 64 different codes."]],
+    e: "5 bits give 32 codes, which is too few. 6 bits give 2⁶ = 64 codes, which is enough for 40 items." },
+  { t: "bin", q: "What is the largest decimal number that can be stored using 8 bits (unsigned)?",
+    o: [["127", "127 is the largest value for 7 bits (2⁷ − 1)."], ["128", "128 is just the value of the leftmost bit. The other seven bits can add more."], ["255", ""], ["256", "256 would need a 9th bit. Eight bits cover 256 values in total, but they start at 0."]],
+    e: "8 bits give 2⁸ = 256 values, starting at 0, so the largest is 255 (11111111)." },
+
+  // ---------- Hexadecimal and Colors
+  { t: "hex", q: "What is the decimal value of the hexadecimal digit F?",
+    o: [["10", "10 is the hex digit A."], ["14", "14 is the hex digit E."], ["15", ""], ["16", "16 needs two hex digits (10). A single hex digit only goes up to 15."]],
+    e: "Hex digits count 0 through 9, then A (10), B (11), C (12), D (13), E (14), and F (15)." },
+  { t: "hex", q: "A web page uses the color code #FF0000, written as red, green, and blue pairs. Which color is shown?",
+    o: [["Red", ""], ["Green", "Green would be #00FF00. The first pair controls red."], ["Blue", "Blue would be #0000FF. The last pair controls blue."], ["White", "White would be #FFFFFF, with all three pairs at their maximum."]],
+    e: "The pairs are red, green, and blue. FF is the maximum for red (255), and 00 means no green or blue, so the color is pure red." },
+  { t: "hex", q: "How many bits does one hexadecimal digit represent?",
+    o: [["2", "Two bits only make 4 different values, but a hex digit has 16."], ["4", ""], ["8", "Eight bits make two hex digits, which is one byte."], ["16", "16 is the number of values a hex digit can have, not the number of bits."]],
+    e: "A hex digit has 16 possible values, and 4 bits can represent 2⁴ = 16 values. Two hex digits make one byte." },
+  { t: "hex", q: "What is the decimal value of the hexadecimal number 2A?",
+    o: [["26", "A is 10, not 6. The 2 is also in the 16s place, so it is worth 32."], ["32", "That is only the 2 in the 16s place (2 × 16). You still need to add A, which is 10."], ["42", ""], ["52", "A is 10, not 20. Compute 2 × 16 + 10."]],
+    e: "The 2 is in the 16s place: 2 × 16 = 32. The A is 10. So 32 + 10 = 42." },
+
+  // ---------- Representing Data
+  { t: "rep", q: "A computer stores whole numbers using 4 bits. What happens when a program tries to add 1 to the largest number it can store?",
+    o: [["The computer stores the number 16 correctly.", "16 needs 5 bits (10000), but only 4 bits are available."], ["An overflow error occurs.", ""], ["The answer is rounded to the nearest value.", "Rounding happens with real numbers that cannot be stored exactly. Here a whole number is simply too big for the bits allowed."], ["The number of bits grows to 5 on its own.", "The number of bits used for a value is fixed. That fixed size is why overflow can happen."]],
+    e: "The largest 4-bit value is 15 (1111). The number 16 needs 5 bits, so the result is too large for the space available. This is an overflow error." },
+  { t: "rep", q: "Why might 0.1 + 0.2 in a program give a result that is slightly different from exactly 0.3?",
+    o: [["Computers cannot add decimals.", "Computers can add decimals. The issue is how the decimals are stored."], ["Real numbers are stored with a limited number of bits, so some values are approximations.", ""], ["The numbers are too large to store.", "0.1 and 0.2 are small. The issue is precision, not size."], ["Decimals are stored in hexadecimal, which changes their values.", "Hexadecimal is only another way to write numbers. The limit on bits is what causes the error."]],
+    e: "Many decimal values cannot be stored exactly in binary with a limited number of bits. The stored value is a close approximation, which causes a round-off error." },
+  { t: "rep", q: "A black-and-white image is 8 pixels wide and 8 pixels tall, and each pixel is stored with 1 bit. How many bits are needed for the whole image?",
+    o: [["8", "8 is only one row of pixels."], ["16", "That adds the width and height. Multiply them to count all of the pixels."], ["64", ""], ["128", "That would be 16 × 8, which is not the size of this image."]],
+    e: "There are 8 × 8 = 64 pixels, and each one needs 1 bit, so the image needs 64 bits." },
+  { t: "rep", q: "A color image uses 24 bits for each pixel. How many bytes does each pixel use?",
+    o: [["3", ""], ["8", "8 is the number of bits in one byte, not the number of bytes per pixel."], ["24", "24 is the number of bits. A byte holds 8 bits, so you divide."], ["192", "That is 24 × 8. To change bits into bytes you divide by 8."]],
+    e: "A byte is 8 bits, so 24 bits ÷ 8 = 3 bytes per pixel. That is one byte each for red, green, and blue." },
+  { t: "rep", q: "A sound is recorded digitally by measuring the sound wave many times each second. What happens if the number of samples per second is increased?",
+    o: [["The recording is a closer match to the original sound, but the file is larger.", ""], ["The recording is a less accurate match to the original sound.", "More samples capture more detail about the wave, so accuracy improves."], ["The recording becomes lossy.", "Sampling rate is not the same as lossy compression. Higher rates keep more data, not less."], ["The file gets smaller.", "More samples means more data to store, so files are usually larger."]],
+    e: "More samples per second capture the shape of the wave more closely, so the digital version is a better approximation. It also needs more storage space." },
+
+  // ---------- Data Compression
+  { t: "comp", q: "Which of the following uses lossless compression?",
+    o: [["JPEG photos", "JPEG is lossy. It permanently removes some image detail."], ["MP3 music files", "MP3 is lossy. It discards sounds that are hard to hear."], ["PNG images", ""], ["Low-quality streaming video", "Streaming video usually uses lossy compression to reduce the amount of data sent."]],
+    e: "Lossless compression, like PNG or ZIP, lets the original data be rebuilt exactly. JPEG and MP3 are lossy." },
+  { t: "comp", q: "Which statement is true about lossy compression?",
+    o: [["The original data can always be restored perfectly.", "That describes lossless compression. Lossy compression discards some data for good."], ["It can make files much smaller, but some data is lost permanently.", ""], ["It can only be used on text files.", "Lossy compression is mostly used for images, audio, and video, where small losses are hard to notice."], ["It makes files larger so they are easier to send.", "Compression exists to make files smaller."]],
+    e: "Lossy compression permanently removes some information, which often allows much smaller files. It is common for images, audio, and video." },
+  { t: "comp", q: "The text AAAAABBBC is stored as 5A3B1C. Which statement is true?",
+    o: [["It is lossless because the original can be rebuilt exactly.", ""], ["It is lossy because the new version is shorter.", "Being shorter does not make compression lossy. What matters is whether the original can be rebuilt exactly."], ["It is not compression because the information was changed.", "Changing how data is stored while keeping the information is still compression."], ["It cannot be reversed because letters were removed.", "The letters are still there. Each letter is stored once, along with how many times it repeats."]],
+    e: "5A3B1C can be expanded back into AAAAABBBC, so nothing is lost. That makes this a lossless method (run-length encoding)." },
+  { t: "comp", q: "A photographer wants to keep the best possible quality of original photos so they can be edited later. Which choice is best?",
+    o: [["Lossy compression, because it makes the smallest files", "Lossy compression permanently removes detail, which is risky for photos you want to edit later."], ["Lossless compression, because the original data is preserved", ""], ["Delete half of the pixels to save space", "Deleting pixels lowers quality and cannot be undone."], ["Convert the photo to hexadecimal", "Hexadecimal is just another way to write the same bits. It does not compress the photo or protect its quality."]],
+    e: "Lossless compression can shrink files while keeping every detail, so edits can start from the full-quality original." },
+
+  // ---------- Beneficial and Harmful Effects, Digital Divide
+  { t: "imp", q: "Which statement best describes the digital divide?",
+    o: [["The difference between binary and decimal numbers", "That is about number systems. The digital divide is about access to technology."], ["Differences in access to computers and the Internet among people and groups", ""], ["The gap between fast and slow computers", "The digital divide is about people’s access, not computer speed."], ["A bug that splits a program into two parts", "This is not a programming term. The digital divide is a social issue."]],
+    e: "The digital divide is the gap in access to computing and the Internet, shaped by things like income, location, and age." },
+  { t: "imp", q: "A school moves all of its homework to an online website. Which students are most likely to be disadvantaged?",
+    o: [["Students who have reliable Internet at home", "These students can reach the website easily."], ["Students who do not have reliable Internet or a computer at home", ""], ["Students who type quickly", "Typing speed does not decide whether students can reach the homework website."], ["Students who study with friends", "Studying with friends is not tied to access to technology."]],
+    e: "Students without reliable Internet or a device at home have trouble reaching the work. This is an example of how the digital divide can affect opportunities." },
+  { t: "imp", q: "A social media feature meant to help friends stay connected also increases cyberbullying. This is an example of...",
+    o: [["a beneficial effect only", "The feature also caused harm, so it was not only beneficial."], ["an unintended harmful effect of a computing innovation", ""], ["lossless compression", "Compression is about reducing file size and has nothing to do with this example."], ["fault tolerance", "Fault tolerance is about a system continuing to work after a failure."]],
+    e: "Computing innovations can have both beneficial and harmful effects, and the creators may not intend or expect all of them." },
+  { t: "imp", q: "Which action would most help reduce the digital divide in a community?",
+    o: [["Selling new devices at higher prices", "Higher prices would make access harder."], ["Offering free Internet access and computers at public libraries", ""], ["Requiring all services to be online only", "Online-only services can make the divide worse for people without access."], ["Removing computer classes from schools", "This removes chances to learn and would likely widen the divide."]],
+    e: "Public places that provide free computers and Internet access give more people a way to take part online." },
+
+  // ---------- Computing Bias and Crowdsourcing
+  { t: "bias", q: "A facial recognition system works much better for some groups of people than for others. What is the most likely cause?",
+    o: [["The training data did not include a wide variety of people.", ""], ["Computers are always objective.", "Computers follow instructions and data created by people, so bias can still appear."], ["Faces cannot be stored in binary.", "Images, including faces, are stored in binary. That is not the issue."], ["The system uses too many packets.", "Packets are about sending data across a network, not about how well the system recognizes faces."]],
+    e: "Programs learn from the data they are given. If that data does not represent everyone, the results can be biased." },
+  { t: "bias", q: "A company uses a program to screen job applicants. It was trained on past hires, who mostly came from one group. Which step would best reduce bias?",
+    o: [["Train and test with data that represents a wider variety of people.", ""], ["Keep the same data but run the program faster.", "Speed does not change what the program learned."], ["Stop checking the program’s results.", "Checking the results is how bias is found."], ["Test with fewer applicants.", "Fewer, less varied examples can make bias harder to notice."]],
+    e: "More representative data, plus testing the results across different groups, helps find and reduce bias." },
+  { t: "bias", q: "Which of the following is the best example of crowdsourcing?",
+    o: [["Employees working together in one office", "Crowdsourcing gathers help from a large, outside group, often online."], ["Volunteers online classifying photos of galaxies to help scientists", ""], ["One programmer writing a program alone", "A single person is not a crowd."], ["A teacher grading a quiz", "That involves one person, not a large group contributing."]],
+    e: "Crowdsourcing means getting input, ideas, or work from a large group of people, usually over the Internet. Citizen science projects are a common example." },
+  { t: "bias", q: "Which statement about bias in computing is true?",
+    o: [["Algorithms are never biased because they are math.", "Algorithms can reflect bias in their data or in the choices of their creators."], ["Bias can come from the data used or from decisions the programmers made.", ""], ["Bias only happens when a computer breaks.", "Bias can occur even when a program works exactly as designed."], ["Bias can only be fixed by deleting the program.", "Bias can often be reduced by changing the data, the design, or the testing."]],
+    e: "Computing bias can come from the data, the design, or the assumptions of the people who build a system, even when everything runs correctly." },
+
+  // ---------- Legal, Ethical, and Safe Computing
+  { t: "legal", q: "What does a Creative Commons license allow?",
+    o: [["Creators can share their work while stating how others may use it.", ""], ["Anyone can claim the work as their own.", "Creative Commons still requires credit for the creator."], ["The creator’s copyright is removed entirely.", "The creator keeps the copyright and chooses how others may use the work."], ["It blocks all copying of the work.", "Creative Commons is designed to allow sharing under specific terms."]],
+    e: "Creative Commons licenses let creators keep their copyright while giving others clear permission to use the work in certain ways, often with credit." },
+  { t: "legal", q: "A student wants to use a photo found online in a school project. Which is the best action?",
+    o: [["Use it without checking, since it was online.", "Being online does not mean a photo is free to use."], ["Check the license, use a photo that allows reuse, and give credit as required.", ""], ["Crop out the creator’s name.", "This hides credit and can break the license terms."], ["Change one color and call it new work.", "Small edits do not give you ownership of someone else’s work."]],
+    e: "Check the license or ask permission, and follow the terms, such as giving credit. This respects the creator’s rights." },
+  { t: "legal", q: "Which situation is an example of phishing?",
+    o: [["An email that appears to be from a bank asks you to click a link and enter your password.", ""], ["A computer slows down because it needs more memory.", "That is a hardware issue, not an attack."], ["A website uses HTTPS.", "HTTPS is a security feature, not an attack."], ["A friend shares a Creative Commons photo.", "That is a legal way to share, not an attack."]],
+    e: "Phishing tries to trick people into giving up private information, often with messages that look like they come from a trusted source." },
+  { t: "legal", q: "Which of the following is an example of multifactor authentication?",
+    o: [["Typing a password twice", "Both entries are the same type of factor, something you know."], ["Typing a password and then entering a code sent to your phone", ""], ["Using a very long password", "A long password is stronger, but it is still only one factor."], ["Using the same password on every site", "This is a risky habit, and it is still only one factor."]],
+    e: "Multifactor authentication requires two or more different kinds of proof, such as something you know (a password) and something you have (your phone)." },
+  { t: "legal", q: "Which of these is personally identifiable information (PII)?",
+    o: [["The weather in your city", "Weather is public and does not identify you."], ["Your home address and Social Security number", ""], ["The name of a popular song", "This does not identify a person."], ["The color of the sky", "This does not identify a person."]],
+    e: "PII is information that can identify or contact a specific person, such as an address or Social Security number. It should be protected." },
+
+  // ---------- Domain Names and IP Addresses
+  { t: "dns", q: "What is the main job of the Domain Name System (DNS)?",
+    o: [["Encrypt websites", "Encryption is done by protocols like HTTPS, not DNS."], ["Translate domain names into IP addresses", ""], ["Split messages into packets", "Packets are created by the sending device and its protocols, not by DNS."], ["Store the pages of websites", "Web servers store the pages. DNS only helps find the right server."]],
+    e: "People use names like example.com. DNS looks up the matching IP address so the browser knows where to send its request." },
+  { t: "dns", q: "In the web address www.school.edu, which part is the top-level domain?",
+    o: [["www", "www is the start of the name, a subdomain label."], ["school", "school is the second-level domain, the name chosen by the organization."], [".edu", ""], ["www.school", "That is a larger piece of the name, not the top-level domain."]],
+    e: "The domain hierarchy is read from right to left. The last part, .edu, is the top-level domain." },
+  { t: "dns", q: "Why was IPv6 created?",
+    o: [["IPv4 did not have enough addresses for the number of devices.", ""], ["IPv6 makes packets smaller.", "IPv6 does not shrink packets. Its main benefit is far more addresses."], ["IPv4 could not be used on the Internet.", "IPv4 was used widely and still is."], ["IPv6 replaces domain names.", "Domain names are separate and still map to IP addresses."]],
+    e: "IPv4 addresses use 32 bits, which gives about 4.3 billion addresses. IPv6 uses 128 bits for a far larger supply." },
+  { t: "dns", q: "Which statement about IP addresses is true?",
+    o: [["An IP address is the same thing as a domain name.", "A domain name is a readable name. An IP address is a number."], ["Routers never use IP addresses.", "Routers use IP addresses to decide where to forward packets."], ["Every website uses the same IP address.", "Different servers have different IP addresses."], ["Devices need an address so packets can be delivered to them.", ""]],
+    e: "IP addresses identify devices on a network so routers know where to send packets." },
+  { t: "dns", q: "A user types a web address into a browser. What usually happens first?",
+    o: [["The web server sends the page.", "The server cannot send the page until the browser knows where to ask."], ["The browser asks DNS for the IP address of the site.", ""], ["A router encrypts the page.", "Routers forward packets. They do not encrypt the page."], ["The browser compresses the page.", "That is not the first step."]],
+    e: "The browser needs the site’s IP address, so it asks DNS to look up the domain name. Then it sends its request to that address." },
+
+  // ---------- Routers, Packets, and Protocols
+  { t: "pkt", q: "What does a packet contain?",
+    o: [["A piece of the data plus a header with details such as source, destination, and packet number", ""], ["An entire file", "Large files are split into many packets."], ["Only the destination address", "A packet also carries part of the data."], ["A copy of a router", "Routers are devices, not part of a packet."]],
+    e: "Each packet holds part of the message and a header. The header tells routers where to send it and tells the receiver how to put the message back together." },
+  { t: "pkt", q: "What is the main job of a router?",
+    o: [["Store websites", "Servers store websites."], ["Assign domain names", "Domain names are handled through DNS and registrars."], ["Encrypt all data", "Routers forward packets. Encryption is done by other protocols."], ["Forward packets toward their destination", ""]],
+    e: "A router receives packets and passes each one to the next router that is closer to its destination." },
+  { t: "pkt", q: "The packets of one message arrive at a computer out of order. What happens next?",
+    o: [["The message is deleted.", "Out-of-order arrival is normal, not a failure."], ["The packet numbers are used to put them back in order.", ""], ["The sender must start over.", "Only missing packets might need to be sent again."], ["The packets are read in the order they arrived.", "That could scramble the message. The packet numbers fix the order."]],
+    e: "Packets can take different routes, so they may arrive in a different order. The receiver uses the packet numbers to rebuild the message correctly." },
+  { t: "pkt", q: "Which protocol checks that every packet arrives and resends any that are lost?",
+    o: [["UDP", "UDP does not check delivery."], ["DNS", "DNS looks up IP addresses."], ["IP", "IP addresses and routes packets but does not guarantee delivery."], ["TCP", ""]],
+    e: "TCP numbers packets, checks that each one arrives, and asks for lost packets again. That makes it reliable but a bit slower." },
+  { t: "pkt", q: "Which application is best suited to UDP?",
+    o: [["Downloading a tax form", "A document must be complete, so TCP is a better fit."], ["Sending an email with an attachment", "Email needs every packet, so TCP is a better fit."], ["A live video call where speed matters more than a few lost packets", ""], ["Loading a bank statement", "Accuracy matters here, so TCP is a better fit."]],
+    e: "UDP is faster because it skips the checking. A live call can handle a small amount of loss better than it can handle delays." },
+  { t: "pkt", q: "What is a protocol?",
+    o: [["A type of cable", "Cables are hardware."], ["A kind of router", "A router is a device. A protocol is a set of rules."], ["A set of rules that devices follow to communicate", ""], ["A password", "A password is a secret used to prove identity."]],
+    e: "A protocol is an agreed set of rules, so different devices can understand each other." },
+
+  // ---------- Fault Tolerance
+  { t: "fault", q: "What does it mean for a network to be fault tolerant?",
+    o: [["It never has any problems.", "No system is perfect. Fault tolerance is about handling failures."], ["It can keep working even if some parts fail.", ""], ["It only uses one path.", "A single path means one failure could stop everything."], ["It cannot be hacked.", "Fault tolerance is about failures, not security."]],
+    e: "A fault-tolerant system continues to work when some of its parts fail." },
+  { t: "fault", q: "Why do networks often have multiple paths between devices?",
+    o: [["So data can take another route if one path fails", ""], ["To make each packet larger", "The number of paths does not change packet size."], ["To avoid using IP addresses", "Paths and IP addresses are separate ideas."], ["To slow traffic down on purpose", "The goal is reliability, not slower traffic."]],
+    e: "Having extra paths is called redundancy. If one router or link fails, packets can be sent a different way." },
+  { t: "fault", q: "Routers are connected like this: A to B, A to C, B to D, and C to D. Router B stops working. Can a packet still get from A to D?",
+    o: [["No, because B is on every path.", "There is another route: A to C to D."], ["Yes, but only by going through B.", "B is not working, so it cannot be used."], ["No, because D has failed.", "D is working. Only B failed."], ["Yes, by going from A to C to D.", ""]],
+    e: "The network has a second route through C, so it can still deliver packets from A to D without B." },
+  { t: "fault", q: "A network has only one path between two offices. Which change would most improve its fault tolerance?",
+    o: [["Add a second, separate path between the offices.", ""], ["Use larger packets.", "Packet size does not help if the only path fails."], ["Remove all of the routers.", "Without routers, packets cannot be forwarded."], ["Use one very fast cable.", "A faster single cable still has no backup."]],
+    e: "A second independent path gives packets a backup route, which is redundancy." },
+
+  // ---------- Parallel and Distributed Computing
+  { t: "par", q: "Which statement describes parallel computing?",
+    o: [["A program runs one step at a time on one processor.", "That is sequential computing."], ["A program is broken into parts, and some parts run at the same time.", ""], ["A program runs only after the previous program ends.", "That is sequential, not parallel."], ["A program is deleted after it finishes.", "That has nothing to do with parallel computing."]],
+    e: "In parallel computing, a program is split into parts and several parts run at the same time on multiple processors." },
+  { t: "par", q: "How is distributed computing different from parallel computing on a single computer?",
+    o: [["It uses only one processor.", "Distributed computing uses many devices."], ["It runs steps one at a time.", "That is sequential computing."], ["It uses multiple separate devices connected by a network.", ""], ["It cannot solve large problems.", "Distributed systems are often used to solve very large problems."]],
+    e: "Distributed computing spreads the work across multiple computers that communicate over a network." },
+  { t: "par", q: "A program has three independent tasks that take 15, 10, and 25 seconds. What is the shortest total time when two processors run tasks in parallel?",
+    o: [["10 seconds", "The longest task alone takes 25 seconds, so the total cannot be less than that."], ["25 seconds", ""], ["35 seconds", "That comes from a poor split, 25 + 10 on one processor. Putting 25 alone and 15 + 10 together does better."], ["50 seconds", "That is the sequential time (15 + 10 + 25). Parallel should be shorter."]],
+    e: "Run the 25-second task on one processor and the other two tasks (15 + 10 = 25) on the second. Both finish in 25 seconds." },
+  { t: "par", q: "A program takes 60 seconds sequentially and 20 seconds in parallel. What is the speedup?",
+    o: [["2", "60 ÷ 20 is not 2."], ["40", "40 is the number of seconds saved, not the speedup."], ["80", "80 is 60 + 20. Speedup is sequential time divided by parallel time."], ["3", ""]],
+    e: "Speedup = sequential time ÷ parallel time = 60 ÷ 20 = 3." },
+  { t: "par", q: "Which task would benefit the least from parallel computing?",
+    o: [["Resizing 500 photos that do not depend on each other", "These can run at the same time."], ["Counting words in many separate files", "The files are independent, so the work can be split."], ["A series of calculations where each step needs the result of the step before", ""], ["Searching many separate web pages for a word", "Each page can be searched independently."]],
+    e: "If every step depends on the previous one, steps cannot run at the same time, so parallel processing helps very little." },
+  { t: "par", q: "Why is distributed computing useful for very large problems?",
+    o: [["Many computers can share the work.", ""], ["It uses fewer computers.", "It usually uses more computers, not fewer."], ["It removes the need for a network.", "The devices must be connected by a network."], ["It makes the problem smaller.", "The problem stays the same size. The work is divided up."]],
+    e: "Splitting a large problem across many computers lets them work on pieces at the same time, which can finish problems that one computer could not handle." },
+
+  // ---------- HTTPS, Certificates, and Keys (Week 8 preview)
+  { t: "https", q: "What does the S in HTTPS add to HTTP?",
+    o: [["Faster page loading", "HTTPS focuses on security, not speed."], ["Encryption and website authentication", ""], ["More storage on the server", "HTTPS has nothing to do with storage."], ["A new set of IP addresses", "IP addresses are a separate part of the network."]],
+    e: "HTTPS encrypts the connection and lets the browser check that the site is who it claims to be." },
+  { t: "https", q: "What is the role of a certificate authority (CA)?",
+    o: [["Verify a site’s identity and issue a certificate", ""], ["Assign IP addresses to devices", "IP addresses are assigned by network systems, not CAs."], ["Translate domain names", "DNS does that."], ["Encrypt every packet on the Internet", "CAs do not encrypt traffic. They vouch for who owns a website."]],
+    e: "A certificate authority is a trusted organization that checks who owns a website and issues it a certificate that browsers can trust." },
+  { t: "https", q: "A message is encrypted with Dana’s public key. Which key decrypts it?",
+    o: [["Dana’s public key", "The public key locks the message. It cannot unlock it."], ["The sender’s private key", "Only the owner of the matching private key can decrypt it."], ["Dana’s private key", ""], ["Any public key", "Public keys cannot decrypt messages."]],
+    e: "The two keys are a matched pair. Only Dana’s private key, which she keeps secret, can decrypt a message locked with her public key." },
+  { t: "https", q: "Why is it safe to share a public key with everyone?",
+    o: [["It can encrypt messages but cannot decrypt them.", ""], ["It is identical to the private key.", "The two keys are a matched pair, but they are not the same."], ["It expires after one message.", "Expiration is unrelated to why sharing is safe."], ["It is hidden inside a certificate.", "Certificates carry public keys openly."]],
+    e: "A public key can only lock messages. Without the private key, someone who intercepts the message cannot read it." }
+];
+
+</script>
+<script>
+(function () {
+  var app = document.getElementById("app");
+  var LETTERS = ["A", "B", "C", "D"];
+  var state = { selected: {}, count: 10, mode: "setup", queue: [], i: 0, correct: 0, log: [], answered: false };
+
+  TOPICS.forEach(function (t) { state.selected[t.id] = !t.preview; });
+
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (k === "class") n.className = attrs[k];
+      else if (k === "text") n.textContent = attrs[k];
+      else if (k.slice(0, 2) === "on") n.addEventListener(k.slice(2), attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    }
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function svgCheck() {
+    var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("viewBox", "0 0 16 16"); s.setAttribute("aria-hidden", "true");
+    var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", "M3 8.5l3.2 3.2L13 4.8"); p.setAttribute("stroke-linecap", "round"); p.setAttribute("stroke-linejoin", "round");
+    s.appendChild(p); return s;
+  }
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function topicName(id) { return TOPICS.filter(function (t) { return t.id === id; })[0].name; }
+  function availableCount() {
+    return QUESTIONS.filter(function (q) { return state.selected[q.t]; }).length;
+  }
+  function clear() { while (app.firstChild) app.removeChild(app.firstChild); }
+  function focusHeading() { var h = app.querySelector("[data-focus]"); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: false }); } }
+
+  /* ---------------- setup */
+  function renderSetup() {
+    state.mode = "setup";
+    document.getElementById("lede").hidden = false;
+    clear();
+    var left = el("div");
+    var linkRow = el("div", { class: "links" }, [
+      el("button", { class: "linkbtn", type: "button", text: "Select all", onclick: function () { TOPICS.forEach(function (t) { state.selected[t.id] = true; }); renderSetup(); } }),
+      el("button", { class: "linkbtn", type: "button", text: "Clear all", onclick: function () { TOPICS.forEach(function (t) { state.selected[t.id] = false; }); renderSetup(); } })
+    ]);
+    left.appendChild(el("h2", { text: "Choose topics", "data-focus": "1" }));
+    left.appendChild(linkRow);
+    var groups = [];
+    TOPICS.forEach(function (t) { if (groups.indexOf(t.group) < 0) groups.push(t.group); });
+    groups.forEach(function (g) {
+      var box = el("section", { class: "group" }, [el("h3", { text: g })]);
+      TOPICS.filter(function (t) { return t.group === g; }).forEach(function (t) {
+        var n = QUESTIONS.filter(function (q) { return q.t === t.id; }).length;
+        var nameKids = [t.name];
+        if (t.preview) nameKids.push(el("span", { class: "tag", text: "Week 8 preview" }));
+        var b = el("button", { class: "topic", type: "button", role: "checkbox", "aria-checked": String(!!state.selected[t.id]),
+          onclick: function () { state.selected[t.id] = !state.selected[t.id]; var y = window.scrollY; renderSetup(); window.scrollTo(0, y); var again = app.querySelector('[data-t="' + t.id + '"]'); if (again) again.focus({ preventScroll: true }); },
+          "data-t": t.id }, [
+          el("span", { class: "box" }, [svgCheck()]),
+          el("span", { class: "tname" }, nameKids),
+          el("span", { class: "tcount", text: n + (n === 1 ? " question" : " questions") })
+        ]);
+        box.appendChild(b);
+      });
+      left.appendChild(box);
+    });
+
+    var avail = availableCount();
+    var shown = Math.min(state.count === 0 ? avail : state.count, avail);
+    var panel = el("aside", { class: "panel", "aria-label": "Your practice set" }, [
+      el("h2", { text: "Your practice set" }),
+      el("p", { class: "avail", text: String(avail) }),
+      el("p", { class: "availlbl", text: avail === 1 ? "question available in your topics" : "questions available in your topics" }),
+      el("p", { class: "sr", id: "countlabel", text: "Number of questions" }),
+      el("div", { class: "seg", role: "group", "aria-labelledby": "countlabel" }, [10, 20, 0].map(function (c) {
+        return el("button", { type: "button", "aria-pressed": String(state.count === c), text: c === 0 ? "All" : String(c),
+          onclick: function () { state.count = c; renderSetup(); var s = app.querySelector('.seg button[aria-pressed="true"]'); if (s) s.focus({ preventScroll: true }); } });
+      })),
+      el("button", { class: "primary", type: "button", text: avail ? "Start " + shown + (shown === 1 ? " question" : " questions") : "Choose at least one topic", onclick: startFromSelection }),
+      el("p", { class: "note", text: "Answer choices are shuffled every time, so the correct letter changes. Topics tagged Week 8 preview have not been taught yet." })
+    ]);
+    if (!avail) panel.querySelector(".primary").disabled = true;
+    app.appendChild(el("div", { class: "setup" }, [left, panel]));
+  }
+
+  function startFromSelection() {
+    var pool = QUESTIONS.filter(function (q) { return state.selected[q.t]; });
+    if (!pool.length) return;
+    var n = state.count === 0 ? pool.length : Math.min(state.count, pool.length);
+    startQuiz(shuffle(pool).slice(0, n));
+  }
+
+  /* ---------------- quiz */
+  function prepare(q) {
+    var opts = shuffle(q.o.map(function (o) { return { t: o[0], why: o[1], right: o[1] === "" }; }));
+    return { src: q, opts: opts };
+  }
+  function startQuiz(questions) {
+    state.queue = questions.map(prepare);
+    state.i = 0; state.correct = 0; state.log = []; state.mode = "quiz";
+    renderQuestion();
+  }
+  function renderQuestion() {
+    state.answered = false;
+    document.getElementById("lede").hidden = true;
+    clear();
+    var cur = state.queue[state.i];
+    var total = state.queue.length;
+    var bar = el("div", { class: "bar" }, [
+      el("span", { text: "Question " + (state.i + 1) + " of " + total }),
+      el("span", { class: "right", text: state.correct + " correct" })
+    ]);
+    var track = el("div", { class: "track", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(total), "aria-valuenow": String(state.i), "aria-label": "Progress" }, [el("div", { class: "fill" })]);
+    track.firstChild.style.width = Math.round((state.i / total) * 100) + "%";
+    var h = el("h2", { class: "question", text: cur.src.q, "data-focus": "1", id: "qtext" });
+    var list = el("div", { class: "opts", role: "group", "aria-labelledby": "qtext" });
+    cur.opts.forEach(function (o, idx) {
+      var b = el("button", { class: "opt", type: "button", "data-i": String(idx), onclick: function () { choose(idx); } }, [
+        el("span", { class: "bubble", "aria-hidden": "true", text: LETTERS[idx] }),
+        el("span", { class: "otext" }, [el("span", { class: "sr", text: "Choice " + LETTERS[idx] + ". " }), o.t])
+      ]);
+      list.appendChild(b);
+    });
+    var fb = el("div", { class: "fb", id: "fb", role: "status", "aria-live": "polite", hidden: "" });
+    var actions = el("div", { class: "actions", id: "actions", hidden: "" }, [
+      el("button", { class: "primary", id: "next", type: "button", text: state.i + 1 < total ? "Next question" : "See results", onclick: next }),
+      el("span", { class: "hint", text: "Keyboard: press A to D to answer, Enter for next" })
+    ]);
+    var quit = el("div", { class: "actions" }, [el("button", { class: "linkbtn", type: "button", text: "End practice and go back to topics", onclick: renderSetup })]);
+    app.appendChild(bar); app.appendChild(track);
+    app.appendChild(el("p", { class: "qtopic", text: topicName(cur.src.t) }));
+    app.appendChild(h); app.appendChild(list); app.appendChild(fb); app.appendChild(actions); app.appendChild(quit);
+    window.scrollTo(0, 0);
+    h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true });
+  }
+
+  function choose(idx) {
+    if (state.answered) return;
+    state.answered = true;
+    var cur = state.queue[state.i];
+    var picked = cur.opts[idx];
+    var rightIdx = cur.opts.findIndex(function (o) { return o.right; });
+    var ok = picked.right;
+    if (ok) state.correct++;
+    state.log.push({ q: cur.src, picked: picked.t, why: picked.why, right: cur.opts[rightIdx].t, rightLetter: LETTERS[rightIdx], pickedLetter: LETTERS[idx], ok: ok });
+
+    var buttons = app.querySelectorAll(".opt");
+    Array.prototype.forEach.call(buttons, function (b, i) {
+      b.classList.add("locked");
+      b.setAttribute("aria-disabled", "true");
+      var mark = null, srText = null;
+      if (i === rightIdx) { b.classList.add("correct"); mark = "Correct answer"; srText = "Correct answer. "; }
+      else if (i === idx) { b.classList.add("wrong"); mark = "Your answer"; srText = "Your answer, incorrect. "; }
+      else b.classList.add("dim");
+      if (mark) {
+        b.appendChild(el("span", { class: "mark", "aria-hidden": "true", text: mark }));
+        b.querySelector(".otext").insertBefore(el("span", { class: "sr", text: srText }), b.querySelector(".otext").firstChild);
+      }
+    });
+
+    var fb = document.getElementById("fb");
+    fb.className = "fb " + (ok ? "good" : "miss");
+    while (fb.firstChild) fb.removeChild(fb.firstChild);
+    if (ok) {
+      fb.appendChild(el("h2", { text: "Correct" }));
+      fb.appendChild(el("p", { text: cur.src.e }));
+    } else {
+      fb.appendChild(el("h2", { text: "Not quite" }));
+      fb.appendChild(el("p", {}, [el("strong", { text: "Why choice " + LETTERS[idx] + " is wrong: " }), picked.why]));
+      fb.appendChild(el("p", {}, [el("strong", { text: "The correct answer is " + LETTERS[rightIdx] + ": " }), cur.src.e]));
+    }
+    fb.hidden = false;
+    document.getElementById("actions").hidden = false;
+    var nb = document.getElementById("next");
+    nb.focus({ preventScroll: true });
+    var r = fb.getBoundingClientRect();
+    if (r.bottom > window.innerHeight - 90) window.scrollBy({ top: r.bottom - window.innerHeight + 110, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+
+  function next() {
+    if (state.i + 1 < state.queue.length) { state.i++; renderQuestion(); }
+    else renderResults();
+  }
+
+  /* ---------------- results */
+  function renderResults() {
+    state.mode = "results";
+    clear();
+    var total = state.queue.length, pct = Math.round((state.correct / total) * 100);
+    var msg = pct === 100 ? "Perfect score. Try a different set of topics to keep stretching."
+      : pct >= 80 ? "Strong work. Read the explanations for the ones you missed and try them again."
+      : pct >= 60 ? "Good start. Review the missed questions below, then retry them."
+      : "Keep going. Start with the topics at the bottom of the table and retry the missed questions.";
+    app.appendChild(el("h2", { class: "sr", text: "Results", "data-focus": "1" }));
+    app.appendChild(el("div", { class: "score" }, [
+      el("span", { class: "big", text: String(state.correct) }),
+      el("span", { class: "of", text: "of " + total + " correct (" + pct + "%)" })
+    ]));
+    app.appendChild(el("p", { class: "msg", text: msg }));
+
+    // per topic
+    var by = {};
+    state.log.forEach(function (l) { var b = by[l.q.t] || (by[l.q.t] = { n: 0, c: 0 }); b.n++; if (l.ok) b.c++; });
+    var rows = Object.keys(by).sort(function (a, b) { return (by[a].c / by[a].n) - (by[b].c / by[b].n); });
+    var table = el("table", { class: "tb" }, [
+      el("thead", {}, [el("tr", {}, [el("th", { scope: "col", text: "Topic" }), el("th", { scope: "col", text: "Score" }), el("th", { scope: "col", text: "" })])]),
+      el("tbody", {}, rows.map(function (id) {
+        var b = by[id]; var bar = el("div", { class: "mini" }, [el("span")]); bar.firstChild.style.width = Math.round((b.c / b.n) * 100) + "%";
+        return el("tr", {}, [el("td", { text: topicName(id) }), el("td", { class: "num", text: b.c + " of " + b.n }), el("td", {}, [bar])]);
+      }))
+    ]);
+    app.appendChild(table);
+
+    var missed = state.log.filter(function (l) { return !l.ok; });
+    if (missed.length) {
+      app.appendChild(el("h2", { text: "Review your missed questions (" + missed.length + ")" }));
+      missed.forEach(function (l) {
+        app.appendChild(el("details", { class: "miss" }, [
+          el("summary", { text: l.q.q }),
+          el("div", { class: "body" }, [
+            el("p", {}, [el("strong", { text: "You chose: " }), l.picked]),
+            el("p", {}, [el("strong", { text: "Why that is wrong: " }), l.why]),
+            el("p", {}, [el("strong", { text: "Correct answer: " }), l.right]),
+            el("p", {}, [el("strong", { text: "Explanation: " }), l.q.e])
+          ])
+        ]));
+      });
+    } else {
+      app.appendChild(el("p", { class: "perfect", text: "You did not miss any questions in this set." }));
+    }
+
+    var acts = el("div", { class: "actions" });
+    if (missed.length) acts.appendChild(el("button", { class: "primary", type: "button", text: "Retry missed questions", onclick: function () { startQuiz(shuffle(missed.map(function (l) { return l.q; }))); } }));
+    acts.appendChild(el("button", { class: "secondary", type: "button", text: "New practice set", onclick: renderSetup }));
+    app.appendChild(acts);
+    window.scrollTo(0, 0);
+    focusHeading();
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (state.mode !== "quiz") return;
+    var k = e.key.toLowerCase();
+    var map = { a: 0, b: 1, c: 2, d: 3, "1": 0, "2": 1, "3": 2, "4": 3 };
+    if (!state.answered && map.hasOwnProperty(k)) { e.preventDefault(); choose(map[k]); return; }
+    if (state.answered && k === "enter") {
+      var t = e.target;
+      if (t && t.id === "next") return; // button handles its own Enter
+      e.preventDefault(); next();
+    }
+  });
+
+  renderSetup();
+})();
+</script>
+</body>
+</html>
