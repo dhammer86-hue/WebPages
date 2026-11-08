@@ -83,6 +83,7 @@ details.ref ul,details.ref ol,.manual ul,.manual ol{margin:0 0 10px;padding-left
 .work{position:sticky;top:10px}
 .wtools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .wtools button{padding:6px 14px;font-size:17px}
+.wtools button.ghost.on{background:var(--navy);color:var(--bg);border-color:var(--navy)}
 .dot{width:30px;height:30px;border-radius:50%;border:3px solid var(--panel);box-shadow:0 0 0 2px var(--line);padding:0}
 .dot.sel{box-shadow:0 0 0 4px var(--gold)}
 .wbox{position:relative;width:100%;border:3px solid var(--line);border-radius:16px;background:#fff;overflow:hidden;touch-action:none}
@@ -116,6 +117,8 @@ details.ref ul,details.ref ol,.manual ul,.manual ol{margin:0 0 10px;padding-left
 .pic{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:14px;margin-bottom:10px;background:linear-gradient(180deg,var(--sky1),var(--sky2));cursor:zoom-in;border:0;padding:0}
 .picph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:3/2;border-radius:14px;margin-bottom:10px;background:linear-gradient(180deg,var(--sky1),var(--sky2));color:var(--navy);font-weight:800;font-size:16px;flex-direction:column;gap:4px}
 .picph svg{width:70%;height:auto}
+.picph.mystery{background:linear-gradient(160deg,#0b2545,#1f6fd1);color:#fff;text-align:center;padding:8px}
+.qmark{font-family:Fredoka,sans-serif;font-size:64px;line-height:1;color:#f2b705}
 .factcard{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:center;background:var(--bg);border:2px solid var(--line);border-radius:16px;padding:12px;margin:12px 0}
 @media (max-width:760px){.factcard{grid-template-columns:1fr}}
 .factcard img{width:100%;border-radius:12px;display:block}
@@ -276,11 +279,11 @@ function planeBg(x0,x1,y0,y1){
  return s+"</svg>";
 }
 function workHTML(q){
- let bg="",cls="blank",ar="7/4";
+ let bg="",cls="blank",ar="";
  if(q.work&&q.work.startsWith("nl:")){const[,a,b]=q.work.split(":");bg=nlBg(+a,+b);cls="";}
  else if(q.work&&q.work.startsWith("plane:")){const[,a,b,c,d]=q.work.split(":").map((x,i)=>i?+x:x);bg=planeBg(a,b,c,d);cls="";ar=(b-a)+"/"+(d-c);}
  const colors=["#14213d","#DD0426","#1f6fd1","#0a8a37"];
- return `<div class="card work"><div class="wtools"><b>Work area</b>${colors.map((c,i)=>`<button class="dot${i===0?" sel":""}" data-c="${c}" style="background:${c}" aria-label="Pen color ${i+1}"></button>`).join("")}<button class="ghost" id="weras">Eraser</button><button class="ghost" id="wclr">Clear</button></div><div class="wbox ${cls}" id="wbox" style="aspect-ratio:${ar}">${bg}<canvas id="wcv"></canvas></div><p class="tip">Draw, graph, or show your work here. Your drawing is not graded.</p></div>`;
+ return `<div class="card work"><div class="wtools"><b>Work area</b>${colors.map((c,i)=>`<button class="dot${i===0?" sel":""}" data-c="${c}" style="background:${c}" aria-label="Pen color ${i+1}"></button>`).join("")}<button class="ghost" id="weras">Eraser</button><button class="ghost" id="wclr">Clear</button></div><div class="wbox ${cls}" id="wbox" style="${ar?`aspect-ratio:${ar};min-height:420px`:"height:max(560px,calc(100vh - 170px))"}">${bg}<canvas id="wcv"></canvas></div><p class="tip">Draw, graph, or show your work here. Your drawing is not graded.</p></div>`;
 }
 function mountWork(q){
  const cv=$("#wcv"),box=$("#wbox");if(!cv)return;
@@ -289,13 +292,15 @@ function mountWork(q){
  const ctx=cv.getContext("2d");ctx.scale(dpr,dpr);ctx.lineCap="round";ctx.lineJoin="round";
  if(DRAW[q.id]){const img=new Image();img.onload=()=>{ctx.drawImage(img,0,0,r.width,r.height);};img.src=DRAW[q.id];}
  let color="#14213d",erase=false,down=false,lx=0,ly=0;
+ const setCur=()=>{let svg,h;if(erase){svg=`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="12.5" fill="rgba(255,255,255,.6)" stroke="#14213d" stroke-width="1.5" stroke-dasharray="3 2"/></svg>`;h=14;}else{svg=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><circle cx="8" cy="8" r="5" fill="${color}" stroke="#fff" stroke-width="2"/><circle cx="8" cy="8" r="6.5" fill="none" stroke="#14213d" stroke-width="1"/></svg>`;h=8;}cv.style.cursor=`url("data:image/svg+xml,${encodeURIComponent(svg)}") ${h} ${h}, crosshair`;$("#weras").classList.toggle("on",erase);};
+ setCur();
  const pos=e=>{const b=cv.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top];};
  cv.addEventListener("pointerdown",e=>{down=true;[lx,ly]=pos(e);cv.setPointerCapture(e.pointerId);e.preventDefault();});
  cv.addEventListener("pointermove",e=>{if(!down)return;const[x,y]=pos(e);ctx.globalCompositeOperation=erase?"destination-out":"source-over";ctx.strokeStyle=color;ctx.lineWidth=erase?26:3.5;ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();lx=x;ly=y;});
  const up=()=>{if(down){down=false;DRAW[q.id]=cv.toDataURL();if(V.view==="run"&&S.a[V.id]){const a=S.a[V.id];a.work=a.work||{};if(!a.submitted){a.work[q.id]=true;saveSoft();}}}};
  cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
- document.querySelectorAll(".wtools .dot").forEach(b=>b.onclick=()=>{color=b.dataset.c;erase=false;document.querySelectorAll(".wtools .dot").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");});
- $("#weras").onclick=()=>{erase=true;document.querySelectorAll(".wtools .dot").forEach(x=>x.classList.remove("sel"));};
+ document.querySelectorAll(".wtools .dot").forEach(b=>b.onclick=()=>{color=b.dataset.c;erase=false;document.querySelectorAll(".wtools .dot").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");setCur();});
+ $("#weras").onclick=()=>{erase=true;document.querySelectorAll(".wtools .dot").forEach(x=>x.classList.remove("sel"));setCur();};
  $("#wclr").onclick=()=>{ctx.globalCompositeOperation="source-over";ctx.clearRect(0,0,r.width,r.height);delete DRAW[q.id];};
 }
 
@@ -319,7 +324,7 @@ function openManual(mods){
 
 
 function fleetOf(id){const k=SLOT[id];return k?FLEET[k]:null;}
-function picHTML(id){const p=fleetOf(id);if(!p)return "";if(!p.img)return `<div class="picph" aria-hidden="true">${JET.replace('class="jet"','')}<span>Picture coming soon</span></div>`;return `<button class="pic" data-fact="${id}" aria-label="${esc(p.n)} fact card" style="background:url(${p.img}) center/cover"></button>`;}
+function picHTML(id){const p=fleetOf(id);if(!p)return "";if(!unlockedVia(id)){const l=LESSONS.find(x=>x.id===id);return `<div class="picph mystery" aria-label="Mystery plane or battleship"><span class="qmark">?</span><span>Mystery plane or battleship</span><span style="font-weight:700;font-size:14px">${l?"Open the lesson to reveal it":"Finish this to reveal it"}</span></div>`;}if(!p.img)return `<div class="picph" aria-hidden="true">${JET.replace('class="jet"','')}<span>Picture coming soon</span></div>`;return `<button class="pic" data-fact="${id}" aria-label="${esc(p.n)} fact card" style="background:url(${p.img}) center/cover"></button>`;}
 function factHTML(id){const p=fleetOf(id);if(!p)return "";return `<div class="factcard">${p.img?`<img src="${p.img}" alt="${esc(p.n)}">`:`<div class="picph">${JET.replace('class="jet"','')}<span>Picture coming soon</span></div>`}<div><span class="kchip ${p.k==="Battleship"?"ship":""}">${p.k}</span><h4>${esc(p.n)}</h4><p style="margin:0">${esc(p.f)}</p></div></div>`;}
 function openFact(id){modal(`<h2>Fact card</h2>${factHTML(id)}<div class="row"><button id="mclose">Close</button></div>`);$("#mclose").onclick=closeModal;}
 function bindFacts(){document.querySelectorAll("[data-fact]").forEach(b=>b.onclick=()=>openFact(b.dataset.fact));}
@@ -328,8 +333,8 @@ function museumTab(){
  const T=curT();const ids=[...termLessons(T).map(l=>l.id),...termItems(T).map(i=>i.id)].filter(id=>SLOT[id]);
  const got=ids.filter(unlockedVia).length;
  if(!ids.length)return `<p class="tip" style="margin:14px 2px">Term ${T} planes and battleships are on their way.</p>`;
- return `<p class="tip" style="margin:14px 2px 0">Open a lesson or finish an assignment to add its plane or battleship to your museum. Tap a picture for its fact card.</p><h2 class="modh">Term ${T} museum: ${got} of ${ids.length} collected</h2><div class="grid mus">${ids.map(id=>{const p=fleetOf(id),u=unlockedVia(id);const l=LESSONS.find(x=>x.id===id),it=itemById(id);const src=l?`Lesson: ${l.title}`:`${it.title}`;
-  return `<div class="card item ${u?"":"locked"}">${u&&p.img?picHTML(id):(p.img?`<div style="position:relative"><img class="pic" src="${p.img}" alt="" style="cursor:default"></div>`:`<div class="picph">${JET.replace('class="jet"','')}<span>Picture coming soon</span></div>`)}<span class="kchip ${p.k==="Battleship"?"ship":""}">${p.k}</span><h3>${u?esc(p.n):"Locked"}</h3><p class="sub">${u?esc(p.f):`Unlock it: ${esc(src)}`}</p></div>`;}).join("")}</div>`;
+ return `<p class="tip" style="margin:14px 2px 0">Open a lesson or finish an assignment to reveal its plane or battleship. Tap a picture for its fact card.</p><h2 class="modh">Term ${T} museum: ${got} of ${ids.length} collected</h2><div class="grid mus">${ids.map(id=>{const p=fleetOf(id),u=unlockedVia(id);const l=LESSONS.find(x=>x.id===id),it=itemById(id);const src=l?`Lesson: ${l.title}`:`${it.title}`;
+  return `<div class="card item ${u?"":"locked"}">${picHTML(id)}${u?`<span class="kchip ${p.k==="Battleship"?"ship":""}">${p.k}</span>`:""}<h3>${u?esc(p.n):"Locked"}</h3><p class="sub">${u?esc(p.f):`Unlock it: ${esc(src)}`}</p></div>`;}).join("")}</div>`;
 }
 /* ===== views ===== */
 const JET=`<svg class="jet" viewBox="0 0 420 130" aria-hidden="true"><defs><linearGradient id="jb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9d4e2"/></linearGradient></defs><path d="M20 70 Q30 44 70 42 L330 42 Q392 46 408 66 Q392 84 330 88 L70 90 Q30 90 20 70z" fill="url(#jb)" stroke="#6b7a90" stroke-width="2"/><path d="M60 44 L30 6 L70 6 L112 44z" fill="#DD0426" stroke="#8d0319" stroke-width="2"/><path d="M168 66 L112 118 L168 118 L252 76z" fill="#dfe6ef" stroke="#6b7a90" stroke-width="2"/><rect x="250" y="88" width="46" height="16" rx="8" fill="#b9c4d3" stroke="#6b7a90" stroke-width="2"/><path d="M356 50 L384 52 Q396 58 398 64 L360 62z" fill="#1d3557"/><g fill="#5b7aa3">${Array.from({length:14},(_,i)=>`<rect x="${112+i*15}" y="58" width="7" height="9" rx="3"/>`).join("")}</g><path d="M20 70 L408 66" stroke="#DD0426" stroke-width="4" fill="none" opacity=".0"/></svg>`;
@@ -400,7 +405,7 @@ async function openItem(id){
  }
  if(!a.started&&it.type!=="hw"){
   const rules=it.type==="project"?"This project has number parts that are scored by the computer and writing parts that your teacher scores. You can use the flight manual. Each number part is worth 4 points, and showing your work in the work area earns partial credit. Submit when you are finished to get your mission keyword.":"This is a one-attempt assessment. You can move between questions and flag ones to check later. There are no hints and no flight manual. Each question is worth 4 points. A wrong answer still earns 2 points if you show your work in the work area, or 1 point if you tried. Blank answers earn 0. When you submit, your answers are locked and you get a mission keyword.";
-  const go=await new Promise(res=>{modal(`<h2>${esc(it.title)}</h2><p>${esc(it.sub)}</p>${factHTML(it.id)}<div class="warn">About ${it.min} minutes. ${esc(rules)} Use paper and a pencil for your work.</div><div class="row"><button id="beg">Begin</button><button class="ghost" id="nob">Not yet</button></div>`);$("#beg").onclick=()=>{closeModal();res(true);};$("#nob").onclick=()=>{closeModal();res(false);};});
+  const go=await new Promise(res=>{modal(`<h2>${esc(it.title)}</h2><p>${esc(it.sub)}</p><div style="max-width:320px">${picHTML(it.id)}</div><div class="warn">About ${it.min} minutes. ${esc(rules)} Use paper and a pencil for your work.</div><div class="row"><button id="beg">Begin</button><button class="ghost" id="nob">Not yet</button></div>`);$("#beg").onclick=()=>{closeModal();res(true);};$("#nob").onclick=()=>{closeModal();res(false);};});
   if(!go)return;
  }
  a.started=a.started||Date.now();save();run(id);
@@ -498,7 +503,7 @@ function review(id){
   const ok=a.ok[q.id],pp=qPts(it,q,a);
   return `<div class="rq"><b>Question ${i+1}</b> <span class="${ok?"ok":"no"}">${ok?"Correct":"Not correct"}</span> <span class="tip">${pp} of ${PPQ} points</span><div class="qtext" style="font-size:21px">${esc(q.q)}</div>${q.fig?`<div class="fig">${q.fig}</div>`:""}<div>Your answer: <b>${esc(a.ans[q.id]===undefined||a.ans[q.id]===""?"(no answer)":a.ans[q.id])}</b></div>${ok?"":`<div>Correct answer: <b>${esc(answerText(q))}</b></div><div class="tip">Review: ${esc(MANUAL[q.mod].title)}</div>`}</div>`;
  }).join("");
- app.innerHTML=topbar()+`<div class="card" style="margin-top:12px"><button class="ghost" id="hang">Back to hangar</button><h2 style="font-size:32px;margin-top:12px">${esc(it.title)}: Results</h2><div class="row" style="align-items:flex-end"><div class="big">${r.pct.toFixed(0)}%</div><div><div>${r.earned} of ${r.total} points${it.type==="hw"?` | First try: ${r.firstPct.toFixed(0)}%`:""}</div><div class="tip">Time: about ${Math.max(1,Math.round(a.secs/60))} minutes (suggested ${it.min})</div></div></div>${keywordFor(it)?`<div class="warn" style="font-size:22px">Mission keyword: <b>${esc(keywordFor(it))}</b><br><span style="font-size:18px">Type this keyword into the Learning Lab assignment so your teacher can record your score.</span></div>`:""}${it.type==="project"?`<div class="warn">This percent is only the number parts. Your teacher scores the writing parts separately.</div>`:""}<div class="row"><button id="copy">Copy my report</button></div></div><div class="card review" style="margin-top:16px">${items}</div>`;
+ app.innerHTML=topbar()+`<div class="card" style="margin-top:12px"><button class="ghost" id="hang">Back to hangar</button><h2 style="font-size:32px;margin-top:12px">${esc(it.title)}: Results</h2><div class="row" style="align-items:flex-end"><div class="big">${r.pct.toFixed(0)}%</div><div><div>${r.earned} of ${r.total} points${it.type==="hw"?` | First try: ${r.firstPct.toFixed(0)}%`:""}</div><div class="tip">Time: about ${Math.max(1,Math.round(a.secs/60))} minutes (suggested ${it.min})</div></div></div>${r.done&&fleetOf(it.id)?`<p class="idea" style="margin:14px 0 0">Unlocked for your museum:</p>${factHTML(it.id)}`:""}${keywordFor(it)?`<div class="warn" style="font-size:22px">Mission keyword: <b>${esc(keywordFor(it))}</b><br><span style="font-size:18px">Type this keyword into the Learning Lab assignment so your teacher can record your score.</span></div>`:""}${it.type==="project"?`<div class="warn">This percent is only the number parts. Your teacher scores the writing parts separately.</div>`:""}<div class="row"><button id="copy">Copy my report</button></div></div><div class="card review" style="margin-top:16px">${items}</div>`;
  bindTop();
  $("#hang").onclick=home;
  $("#copy").onclick=()=>copyReport(id);
