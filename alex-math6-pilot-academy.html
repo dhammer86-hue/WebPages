@@ -5,34 +5,40 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alex’s Pilot Academy: Math 6</title>
-<style>
-:root{--bg:#eef5fb;--ink:#14213d;--soft:#4a5a75;--accent:#DD0426;color-scheme:light}
-@media (prefers-color-scheme:dark){:root{--bg:#0c1627;--ink:#eef4fb;--soft:#b5c4da;--accent:#ff5a73;color-scheme:dark}}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;font-size:19px;line-height:1.45}
-main{max-width:560px;margin:60px auto;padding:0 16px;text-align:center}
-a{color:var(--accent);font-weight:700}
-p{color:var(--soft)}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://dhammer86-hue.github.io/WebPages/pilot-academy-app/app.css">
 </head>
-<body>
-<main>
-<h1>Taking you to Pilot Academy...</h1>
-<p>Sign in with your school Google account if Google asks.</p>
-<p><a id="go" href="https://script.google.com/a/macros/cga.school/s/AKfycbzROeWNEUF1itw7WKoDnJCxLHgxmWeXtpHHNekOFsmCJodi0R2g9zjNbFZ6HDextM-Bkw/exec">Open Pilot Academy</a></p>
-</main>
+<body style="font-family:system-ui,sans-serif">
+<div id="app"><p id="pilotmsg" style="text-align:center;margin-top:60px;font-size:20px;color:#4a5a75;background:#eef5fb;padding:20px;border-radius:12px">Loading Pilot Academy...</p></div>
+<div id="modal" hidden></div>
 <script>
-// Pilot Academy now saves progress to each student's school account.
-// Progress saved in this browser by the old page rides along once so nothing is lost.
-var APP = document.getElementById("go").href;
-var target = APP;
-try {
-  var old = localStorage.getItem("m6t1:alex");
-  if (old && old.length < 500000) {
-    target = APP + "#import=" + encodeURIComponent(btoa(unescape(encodeURIComponent(old))));
-  }
-} catch (e) {}
-document.getElementById("go").href = target;
-location.replace(target);
+function pilotProblem(text) {
+  var m = document.getElementById("pilotmsg");
+  if (m) m.textContent = "Pilot Academy could not start. Please send this to your teacher: " + text;
+}
+window.addEventListener("error", function (e) { pilotProblem(e.message || "a file did not load"); });
+(function () {
+  try {
+    // Before sign-in was optional this link always went to the account, so anyone with
+    // progress saved here from back then keeps going to their account.
+    var old = localStorage.getItem("m6t1:alex");
+    if (location.hash === "#signout") {
+      localStorage.removeItem("pilot:account");
+      localStorage.removeItem("m6t1:alex");
+      history.replaceState(null, "", location.pathname);
+    } else if (!localStorage.getItem("pilot:v2") && old) {
+      localStorage.setItem("pilot:account", "1");
+    }
+    localStorage.setItem("pilot:v2", "1");
+    if (localStorage.getItem("pilot:account") === "1") {
+      var u = "https://script.google.com/a/macros/cga.school/s/AKfycbzROeWNEUF1itw7WKoDnJCxLHgxmWeXtpHHNekOFsmCJodi0R2g9zjNbFZ6HDextM-Bkw/exec", s = localStorage.getItem("m6t1:alex");
+      if (s && s.length < 500000) u += "#import=" + encodeURIComponent(btoa(unescape(encodeURIComponent(s))));
+      window.PILOT_LEAVING = true;
+      location.replace(u);
+    }
+  } catch (e) {}
+})();
 </script>
+<script>if (!window.PILOT_LEAVING) document.write("<script src=\"https://dhammer86-hue.github.io/WebPages/pilot-academy-app/app.js\" onerror=\"pilotProblem('app.js did not load')\"><\/script>");</script>
 </body>
 </html>

@@ -119,3 +119,6 @@ details.ref ul,details.ref ol,.manual ul,.manual ol{margin:0 0 10px;padding-left
 .mus .locked img{filter:grayscale(1) blur(7px) brightness(.6)}.mus .locked .picph{filter:grayscale(1)}
 .mus .locked{opacity:.85}
 .prize{margin-top:12px;background:var(--panel);border:2px solid var(--gold);border-radius:14px;padding:12px;font-size:19px;line-height:1.4}
+
+.acct{display:inline-block;padding:6px 14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:16px;text-decoration:none}
+.acct.ghost{background:transparent;color:var(--ink);border:3px solid var(--line)}

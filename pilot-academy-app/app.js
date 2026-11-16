@@ -97,15 +97,25 @@ const termLessons=t=>LESSONS.filter(l=>TERM_MODS[t].includes(l.mod));
 function A(id){return S.a[id]||(S.a[id]={ans:{},tries:{},first:{},ok:{},flag:{},secs:0,unlocked:false,submitted:false,started:0,idx:0,subAt:0});}
 const LS_KEY="m6t1:alex";
 function loadLocal(){try{const x=JSON.parse(localStorage.getItem(localKey())||"null");if(x&&x.a){x.p=x.p||{};x.miles=x.miles||0;x.drag=x.drag||0;return x;}}catch(e){}return null;}
-let CLOUD=false;
-let WHO="",cloudT=null,cloudBusy=false,cloudAgain=false;
+const APP_URL="https://script.google.com/a/macros/cga.school/s/AKfycbzROeWNEUF1itw7WKoDnJCxLHgxmWeXtpHHNekOFsmCJodi0R2g9zjNbFZ6HDextM-Bkw/exec",HOME_URL="https://dhammer86-hue.github.io/WebPages/alex-math6-pilot-academy.html";
+let CLOUD=false,WHO="",cloudT=null,cloudBusy=false,cloudAgain=false;
 const localKey=()=>WHO?LS_KEY+":"+WHO:LS_KEY;
 function setStatus(t){const e=$("#savestat");if(e)e.textContent=(WHO?WHO+" | ":"")+t;}
+function acctButton(){
+ if(CLOUD)return `<a class="acct ghost" href="${HOME_URL}#signout" target="_top" onclick="signOut()">Sign out</a>`;
+ return `<a class="acct" href="${APP_URL}" onclick="return signIn()">Sign in to save to your account</a>`;
+}
+function signIn(){
+ let u=APP_URL;
+ try{localStorage.setItem("pilot:account","1");const s=localStorage.getItem(LS_KEY);if(s&&s.length<500000)u+="#import="+encodeURIComponent(btoa(unescape(encodeURIComponent(s))));}catch(e){}
+ location.href=u;return false;
+}
+function signOut(){if(cloudT){clearTimeout(cloudT);pushCloud();}try{localStorage.removeItem(localKey());}catch(e){}return true;}
 function save(){
  S.updated=Date.now();
  try{localStorage.setItem(localKey(),JSON.stringify(S));}catch(e){}
  if(CLOUD){setStatus("Saving...");clearTimeout(cloudT);cloudT=setTimeout(pushCloud,1500);}
- else setStatus("Saved in this browser");
+ else setStatus("Saved on this device");
 }
 function pushCloud(){
  cloudT=null;
@@ -174,7 +184,7 @@ function mountWork(q){
  const setCur=()=>{let svg,h;if(erase){svg=`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="12.5" fill="rgba(255,255,255,.6)" stroke="#14213d" stroke-width="1.5" stroke-dasharray="3 2"/></svg>`;h=14;}else{svg=`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><circle cx="8" cy="8" r="5" fill="${color}" stroke="#fff" stroke-width="2"/><circle cx="8" cy="8" r="6.5" fill="none" stroke="#14213d" stroke-width="1"/></svg>`;h=8;}cv.style.cursor=`url("data:image/svg+xml,${encodeURIComponent(svg)}") ${h} ${h}, crosshair`;$("#weras").classList.toggle("on",erase);};
  setCur();
  const pos=e=>{const b=cv.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top];};
- cv.addEventListener("pointerdown",e=>{down=true;[lx,ly]=pos(e);cv.setPointerCapture(e.pointerId);e.preventDefault();});
+ cv.addEventListener("pointerdown",e=>{down=true;[lx,ly]=pos(e);cv.setPointerCapture(e.pointerId);e.preventDefault();ctx.globalCompositeOperation=erase?"destination-out":"source-over";ctx.fillStyle=color;ctx.beginPath();ctx.arc(lx,ly,(erase?26:3.5)/2,0,Math.PI*2);ctx.fill();});
  cv.addEventListener("pointermove",e=>{if(!down)return;const[x,y]=pos(e);ctx.globalCompositeOperation=erase?"destination-out":"source-over";ctx.strokeStyle=color;ctx.lineWidth=erase?26:3.5;ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();lx=x;ly=y;});
  const up=()=>{if(down){down=false;DRAW[q.id]=cv.toDataURL();if(V.view==="run"&&S.a[V.id]){const a=S.a[V.id];a.work=a.work||{};if(!a.submitted){a.work[q.id]=true;saveSoft();}}}};
  cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
@@ -218,7 +228,7 @@ function museumTab(){
 /* ===== views ===== */
 const JET=`<svg class="jet" viewBox="0 0 420 130" aria-hidden="true"><defs><linearGradient id="jb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9d4e2"/></linearGradient></defs><path d="M20 70 Q30 44 70 42 L330 42 Q392 46 408 66 Q392 84 330 88 L70 90 Q30 90 20 70z" fill="url(#jb)" stroke="#6b7a90" stroke-width="2"/><path d="M60 44 L30 6 L70 6 L112 44z" fill="#DD0426" stroke="#8d0319" stroke-width="2"/><path d="M168 66 L112 118 L168 118 L252 76z" fill="#dfe6ef" stroke="#6b7a90" stroke-width="2"/><rect x="250" y="88" width="46" height="16" rx="8" fill="#b9c4d3" stroke="#6b7a90" stroke-width="2"/><path d="M356 50 L384 52 Q396 58 398 64 L360 62z" fill="#1d3557"/><g fill="#5b7aa3">${Array.from({length:14},(_,i)=>`<rect x="${112+i*15}" y="58" width="7" height="9" rx="3"/>`).join("")}</g><path d="M20 70 L408 66" stroke="#DD0426" stroke-width="4" fill="none" opacity=".0"/></svg>`;
 function topbar(){
- return `<div class="topbar"><div class="brand">${LOGO_DATA?`<img src="${LOGO_DATA}" alt="CGA logo">`:""}<span>Pilot Academy</span></div><div class="userchip"><span id="savestat"></span></div></div>`;
+ return `<div class="topbar"><div class="brand">${LOGO_DATA?`<img src="${LOGO_DATA}" alt="CGA logo">`:""}<span>Pilot Academy</span></div><div class="userchip"><span id="savestat"></span>${acctButton()}</div></div>`;
 }
 function bindTop(){}
 function statusOf(it){
@@ -271,8 +281,8 @@ async function teacherTools(){
  if(btoa(code)!==CFG.teacherCode){alert("That code is not correct.");return;}
  modal(`<h2>Teacher tools</h2><p>Choose an item to reset. This clears answers, tries, and time for that item.</p><div class="row">${termItems(curT()).map(it=>`<button class="ghost" data-r="${it.id}" style="font-size:16px;padding:6px 12px">${esc(it.title.split(":")[0])}</button>`).join("")}</div><p style="margin-top:14px">Or clear all guided practice progress, flight miles, and drag.</p><div class="row"><button class="ghost" id="rprac" style="font-size:16px;padding:6px 12px">Reset guided practice</button><button id="mclose">Close</button></div>`);
  $("#mclose").onclick=closeModal;
- document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{if(confirm("Reset "+b.dataset.r+"? This cannot be undone.")){delete S.a[b.dataset.r];save();closeModal();home();}});
- $("#rprac").onclick=()=>{if(confirm("Reset all guided practice, flight miles, and drag? This cannot be undone.")){S.p={};S.miles=0;S.drag=0;streak=0;save();closeModal();home();}};
+ document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{if(confirm("Reset "+b.dataset.r+"? This cannot be undone.")){delete S.a[b.dataset.r];S.resetAt=Date.now();save();closeModal();home();}});
+ $("#rprac").onclick=()=>{if(confirm("Reset all guided practice, flight miles, and drag? This cannot be undone.")){S.p={};S.miles=0;S.drag=0;streak=0;S.resetAt=Date.now();save();closeModal();home();}};
 }
 async function openItem(id){
  const it=itemById(id),a=A(id),r=result(it);
@@ -490,7 +500,21 @@ setInterval(()=>{
 window.addEventListener("beforeunload",()=>{try{localStorage.setItem(localKey(),JSON.stringify(S));}catch(e){}if(CLOUD&&cloudT){clearTimeout(cloudT);pushCloud();}});
 
 /* ===== start ===== */
-function newest(list){return list.filter(x=>x&&x.a).sort((a,b)=>(b.updated||0)-(a.updated||0))[0]||null;}
+function progressScore(a){if(!a)return -1;const n=o=>Object.keys(o||{}).length;return (a.submitted?1e9:0)+Object.keys(a.ok||{}).filter(k=>a.ok[k]).length*1e5+n(a.ans)*100+n(a.tries)+(a.secs||0)/1e7;}
+function mergeProgress(list){
+ list=list.filter(x=>x&&x.a);if(!list.length)return null;
+ const reset=Math.max(0,...list.map(s=>s.resetAt||0));
+ list=list.filter(s=>(s.updated||0)>=reset);
+ list.sort((a,b)=>(b.updated||0)-(a.updated||0));
+ const m=JSON.parse(JSON.stringify(list[0]));m.a={};m.p={};m.seen={};
+ list.forEach(s=>{
+  Object.keys(s.a||{}).forEach(id=>{if(progressScore(s.a[id])>progressScore(m.a[id]))m.a[id]=s.a[id];});
+  Object.keys(s.p||{}).forEach(id=>{const c=m.p[id],n=s.p[id];m.p[id]=c?{done:!!(c.done||n.done),stars:Math.max(c.stars||0,n.stars||0)}:n;});
+  Object.assign(m.seen,s.seen||{});
+ });
+ m.miles=Math.max(...list.map(s=>s.miles||0));m.drag=Math.max(...list.map(s=>s.drag||0));
+ m.p=m.p||{};return m;
+}
 function boot(){
  CLOUD=!!(window.google&&google.script&&google.script.run);
  if(!CLOUD&&window.PILOT_SHELL&&(boot.waits=(boot.waits||0)+1)<30){setTimeout(boot,100);return;}
@@ -502,8 +526,8 @@ function boot(){
   if(m){try{carried=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));}catch(e){}try{google.script.history.replace(null,{},"");}catch(e){}}
   google.script.run.withSuccessHandler(res=>{
    WHO=res.email||"";let cloud=null;try{cloud=res.data?JSON.parse(res.data):null;}catch(e){}
-   const best=newest([cloud,loadLocal(),carried]);
-   if(best){S=best;S.p=S.p||{};S.miles=S.miles||0;S.drag=S.drag||0;}
+   const merged=mergeProgress([cloud,loadLocal(),carried]);
+   if(merged)S=merged;
    home();
   }).withFailureHandler(fail).getProgress();
  });
