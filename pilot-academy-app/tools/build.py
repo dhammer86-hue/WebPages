@@ -50,6 +50,26 @@ sub('cv.addEventListener("pointerdown",e=>{down=true;[lx,ly]=pos(e);cv.setPointe
     'ctx.globalCompositeOperation=erase?"destination-out":"source-over";ctx.fillStyle=color;'
     'ctx.beginPath();ctx.arc(lx,ly,(erase?26:3.5)/2,0,Math.PI*2);ctx.fill();});')
 
+# "It's time for Homework 2!" once every lesson in an assignment's modules is finished.
+# An exam also waits for its homework, and a final exam waits for the term's other exams.
+sub('function topbar(){', r"""function lessonsCovered(it){return LESSONS.filter(l=>it.mods.includes(l.mod)).every(l=>S.p[l.id]&&S.p[l.id].done);}
+function itemDone(it){const r=result(it);return !!(r&&r.done);}
+function isReady(it){
+ if(itemDone(it)||!lessonsCovered(it))return false;
+ const same=termItems(tOf(it));
+ if(it.type==="exam"){const hw=same.find(x=>x.type==="hw"&&x.mods.join()===it.mods.join());if(hw&&!itemDone(hw))return false;}
+ if(it.type==="term"&&same.some(x=>x.type==="exam"&&!itemDone(x)))return false;
+ return true;
+}
+function readyHTML(its){return its.length?`<div class="ready">${its.map(it=>{const [name,...rest]=it.title.split(":");return `<div class="readyrow"><span><b>It’s time for ${esc(name)}!</b> ${esc(rest.join(":").trim())}</span><button data-open="${it.id}">Start</button></div>`;}).join("")}</div>`:"";}
+function topbar(){""")
+sub('${JET}</div>${tabs}${body}', '${JET}</div>${readyHTML(termItems(T).filter(isReady))}${tabs}${body}')
+sub('if(!r||!r.started)return{t:"Not started",c:""};', 'if(!r||!r.started)return isReady(it)?{t:"Ready! It’s time to start.",c:"prog"}:{t:"Not started",c:""};')
+sub('S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};save();',
+    'const wasReady=ITEMS.filter(isReady).map(x=>x.id);S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};save();const nowReady=ITEMS.filter(x=>isReady(x)&&!wasReady.includes(x.id));')
+sub('Lesson complete!</h2>', 'Lesson complete!</h2>${readyHTML(nowReady)}')
+sub('if(nx)$("#pnxt").onclick=()=>learn(nx.id);', 'document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openItem(b.dataset.open));if(nx)$("#pnxt").onclick=()=>learn(nx.id);')
+
 # Graded activities: no clock or suggested times on screen (they caused anxiety).
 # Time is still recorded quietly and stays in the copied report for the teacher.
 sub('<div class="timer" id="timer">${fmtTime(a.secs)}</div>', '')
@@ -150,7 +170,10 @@ boot();''')
 css = t[t.index('<style>') + 7:t.index('</style>')]
 css += ('\n.acct{display:inline-block;padding:6px 14px;border-radius:12px;background:var(--accent);'
         'color:var(--accent-ink);font-weight:800;font-size:16px;text-decoration:none}'
-        '\n.acct.ghost{background:transparent;color:var(--ink);border:3px solid var(--line)}\n')
+        '\n.acct.ghost{background:transparent;color:var(--ink);border:3px solid var(--line)}'
+        '\n.ready{background:var(--panel);border:3px solid var(--gold);border-radius:18px;padding:12px 18px;margin-top:16px}'
+        '\n.readyrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:21px;padding:4px 0;text-align:left}'
+        '\n.readyrow b{color:var(--accent);font-family:Fredoka,sans-serif;font-weight:600;font-size:24px}\n')
 js = t[t.index('<script>\n/* =====') + 8:t.rindex('</script>')]
 open('pilot-academy-app/app.css', 'w', encoding='utf-8').write(css)
 open('pilot-academy-app/app.js', 'w', encoding='utf-8').write(js)

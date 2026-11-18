@@ -227,12 +227,22 @@ function museumTab(){
 }
 /* ===== views ===== */
 const JET=`<svg class="jet" viewBox="0 0 420 130" aria-hidden="true"><defs><linearGradient id="jb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9d4e2"/></linearGradient></defs><path d="M20 70 Q30 44 70 42 L330 42 Q392 46 408 66 Q392 84 330 88 L70 90 Q30 90 20 70z" fill="url(#jb)" stroke="#6b7a90" stroke-width="2"/><path d="M60 44 L30 6 L70 6 L112 44z" fill="#DD0426" stroke="#8d0319" stroke-width="2"/><path d="M168 66 L112 118 L168 118 L252 76z" fill="#dfe6ef" stroke="#6b7a90" stroke-width="2"/><rect x="250" y="88" width="46" height="16" rx="8" fill="#b9c4d3" stroke="#6b7a90" stroke-width="2"/><path d="M356 50 L384 52 Q396 58 398 64 L360 62z" fill="#1d3557"/><g fill="#5b7aa3">${Array.from({length:14},(_,i)=>`<rect x="${112+i*15}" y="58" width="7" height="9" rx="3"/>`).join("")}</g><path d="M20 70 L408 66" stroke="#DD0426" stroke-width="4" fill="none" opacity=".0"/></svg>`;
+function lessonsCovered(it){return LESSONS.filter(l=>it.mods.includes(l.mod)).every(l=>S.p[l.id]&&S.p[l.id].done);}
+function itemDone(it){const r=result(it);return !!(r&&r.done);}
+function isReady(it){
+ if(itemDone(it)||!lessonsCovered(it))return false;
+ const same=termItems(tOf(it));
+ if(it.type==="exam"){const hw=same.find(x=>x.type==="hw"&&x.mods.join()===it.mods.join());if(hw&&!itemDone(hw))return false;}
+ if(it.type==="term"&&same.some(x=>x.type==="exam"&&!itemDone(x)))return false;
+ return true;
+}
+function readyHTML(its){return its.length?`<div class="ready">${its.map(it=>{const [name,...rest]=it.title.split(":");return `<div class="readyrow"><span><b>It’s time for ${esc(name)}!</b> ${esc(rest.join(":").trim())}</span><button data-open="${it.id}">Start</button></div>`;}).join("")}</div>`:"";}
 function topbar(){
  return `<div class="topbar"><div class="brand">${LOGO_DATA?`<img src="${LOGO_DATA}" alt="CGA logo">`:""}<span>Pilot Academy</span></div><div class="userchip"><span id="savestat"></span>${acctButton()}</div></div>`;
 }
 function bindTop(){}
 function statusOf(it){
- const r=result(it);if(!r||!r.started)return{t:"Not started",c:""};
+ const r=result(it);if(!r||!r.started)return isReady(it)?{t:"Ready! It’s time to start.",c:"prog"}:{t:"Not started",c:""};
  if(it.type==="hw"){const n=scorable(it.id).filter(q=>A(it.id).ok[q.id]).length;return r.done?{t:`Complete: ${r.pct.toFixed(0)}%`,c:"done"}:{t:`In progress: ${n} of ${scorable(it.id).length} correct`,c:"prog"};}
  return r.done?{t:`Submitted: ${r.pct.toFixed(0)}%`,c:"done"}:{t:"In progress",c:"prog"};
 }
@@ -263,7 +273,7 @@ function home(){
  const rows=Object.keys(CFG.weights).map(cat=>{const its=TI.filter(x=>x.cat===cat);const dn=its.filter(x=>{const r=result(x);return r&&r.done;});const avg=dn.length?dn.reduce((s,x)=>s+result(x).pct,0)/dn.length:null;return `<tr><td>${names[cat]}</td><td>${CFG.weights[cat]}%</td><td>${dn.length} of ${its.length}</td><td>${avg===null?"-":avg.toFixed(1)+"%"}</td></tr>`;}).join("");
  const other=T===1?2:1,og=termGrade(other);
  const sw=`<div class="termsw" role="group" aria-label="Choose a term">${[1,2].map(n=>`<button class="tsw${n===T?" on":""}" data-term="${n}" aria-pressed="${n===T}">Term ${n}</button>`).join("")}</div>`;
- app.innerHTML=topbar()+`<div class="hero">${sw}<h1>Alex’s Pilot Academy</h1><p>Math 6 | Term ${T} | Modules ${T===1?"1 to 5":"6 to 10"}</p><div class="stats"><div class="stat"><b>${rankFor(g)}</b>Rank</div><div class="stat"><b>${g===null?"-":g.toFixed(1)+"%"}</b>Term ${T} grade so far</div><div class="stat"><b>${S.miles}</b>Flight miles</div><div class="stat"><b>${S.drag}</b>Drag</div><div class="stat"><b>${lessonsDone} of ${TL.length}</b>Lessons done</div><div class="stat"><b>${done} of ${TI.length}</b>Graded missions</div></div>${JET}</div>${tabs}${body}
+ app.innerHTML=topbar()+`<div class="hero">${sw}<h1>Alex’s Pilot Academy</h1><p>Math 6 | Term ${T} | Modules ${T===1?"1 to 5":"6 to 10"}</p><div class="stats"><div class="stat"><b>${rankFor(g)}</b>Rank</div><div class="stat"><b>${g===null?"-":g.toFixed(1)+"%"}</b>Term ${T} grade so far</div><div class="stat"><b>${S.miles}</b>Flight miles</div><div class="stat"><b>${S.drag}</b>Drag</div><div class="stat"><b>${lessonsDone} of ${TL.length}</b>Lessons done</div><div class="stat"><b>${done} of ${TI.length}</b>Graded missions</div></div>${JET}</div>${readyHTML(termItems(T).filter(isReady))}${tabs}${body}
  <div class="card" style="margin-top:18px"><h2 style="font-size:26px">Term ${T} grade book</h2><table class="gb"><tr><th>Category</th><th>Weight</th><th>Finished</th><th>Average</th></tr>${rows}</table>${og!==null?`<p class="meta">Term ${other} grade: ${og.toFixed(1)}%</p>`:""}<p class="tip">Weights follow the CGA grading categories for math courses: classwork and homework 40%, summative assessments 40%, term exam and project 20%. Each term is graded on its own. Your teacher posts the official grades in Learning Lab.</p><div class="row"><button class="ghost" id="treset" style="font-size:16px;padding:6px 12px">Teacher tools</button></div></div>`;
  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;home();});
  document.querySelectorAll("[data-term]").forEach(b=>b.onclick=()=>{S.term=+b.dataset.term;home();window.scrollTo(0,0);});
@@ -475,11 +485,11 @@ function pAdvance(){PR.i++;if(PR.i<PR.qs.length)practiceAsk();else pFinish();}
 function pFinish(){
  const l=lessonById(PR.lid),n=PR.n0,r=PR.first/n,st=r>=.9?3:r>=.7?2:1;
  const prev=S.p[l.id]||{stars:0};
- S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};save();
+ const wasReady=ITEMS.filter(isReady).map(x=>x.id);S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};save();const nowReady=ITEMS.filter(x=>isReady(x)&&!wasReady.includes(x.id));
  const TL=termLessons(TERM_MODS[1].includes(l.mod)?1:2),idx=TL.findIndex(x=>x.id===l.id),nx=TL[idx+1];
  V={view:"pfinish",id:l.id};
- app.innerHTML=topbar()+`<section class="card" style="margin-top:12px;text-align:center"><h2 style="font-size:34px;color:var(--accent)">Lesson complete!</h2><p>${esc(l.title)}</p><div class="row" style="justify-content:center">${[1,2,3].map(k=>starSVG(k<=st)).join("")}</div><p>${PR.first} of ${n} right on the first try. Miles earned: ${PR.gained}. Mistakes (drag): ${PR.mistakes}.</p>${PR.redos>0?`<div class="scenario" style="max-width:520px;margin:12px auto"><b>Mystery surprise unlocked!</b><br>You finished every missed question. Open the box to see what you won.<div class="row" style="justify-content:center"><button id="mbox">Open mystery box</button></div><div id="mprize" aria-live="polite"></div></div>`:""}<div class="row" style="justify-content:center">${nx?`<button id="pnxt">Next lesson: ${esc(nx.title)}</button>`:""}<button class="ghost" id="pagain">Practice again</button><button class="ghost" id="ptomap">Back to lessons</button></div></section>`;
- if(nx)$("#pnxt").onclick=()=>learn(nx.id);
+ app.innerHTML=topbar()+`<section class="card" style="margin-top:12px;text-align:center"><h2 style="font-size:34px;color:var(--accent)">Lesson complete!</h2>${readyHTML(nowReady)}<p>${esc(l.title)}</p><div class="row" style="justify-content:center">${[1,2,3].map(k=>starSVG(k<=st)).join("")}</div><p>${PR.first} of ${n} right on the first try. Miles earned: ${PR.gained}. Mistakes (drag): ${PR.mistakes}.</p>${PR.redos>0?`<div class="scenario" style="max-width:520px;margin:12px auto"><b>Mystery surprise unlocked!</b><br>You finished every missed question. Open the box to see what you won.<div class="row" style="justify-content:center"><button id="mbox">Open mystery box</button></div><div id="mprize" aria-live="polite"></div></div>`:""}<div class="row" style="justify-content:center">${nx?`<button id="pnxt">Next lesson: ${esc(nx.title)}</button>`:""}<button class="ghost" id="pagain">Practice again</button><button class="ghost" id="ptomap">Back to lessons</button></div></section>`;
+ document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openItem(b.dataset.open));if(nx)$("#pnxt").onclick=()=>learn(nx.id);
  $("#pagain").onclick=()=>startPractice(l.id);$("#ptomap").onclick=home;
  const mb=$("#mbox");
  if(mb)mb.onclick=()=>{const p=PRIZES[Math.floor(Math.random()*PRIZES.length)];S.miles+=p.m;save();mb.disabled=true;mb.textContent="Box opened!";$("#mprize").innerHTML=`<div class="prize"><b>${esc(p.t)}</b><br>${esc(p.x)}<br><b>+${p.m} bonus miles</b></div>`;};
