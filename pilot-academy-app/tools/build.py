@@ -84,13 +84,13 @@ sub('if(nx)$("#pnxt").onclick=()=>learn(nx.id);', 'document.querySelectorAll("[d
 # Extra practice: a second, optional question set for a lesson. It earns miles but leaves
 # the lesson's stars and the "It's time for..." messages alone.
 sub('<button class="ghost" data-prac="${l.id}">Guided practice</button>',
-    '<button class="ghost" data-prac="${l.id}">Guided practice</button>${l.extra?`<button class="ghost" data-xprac="${l.id}">Extra practice</button>`:""}')
+    '<button class="ghost" data-prac="${l.id}">Guided practice</button>${l.extra&&!xpDone(l.id)?`<button class="ghost" data-xprac="${l.id}">Extra practice</button>`:""}')
 sub('<div class="row"><button data-learn="${l.id}">',
     '${l.extra&&S.xp&&S.xp[l.id]?`<div class="meta">Extra practice done: ${S.xp[l.id].best} of ${l.extra.length} first try</div>`:""}<div class="row"><button data-learn="${l.id}">')
 sub('document.querySelectorAll("[data-prac]").forEach(b=>b.onclick=()=>startPractice(b.dataset.prac));',
     'document.querySelectorAll("[data-prac]").forEach(b=>b.onclick=()=>startPractice(b.dataset.prac));document.querySelectorAll("[data-xprac]").forEach(b=>b.onclick=()=>startPractice(b.dataset.xprac,true));')
 sub('<button id="startp">Start guided practice</button>',
-    '<button id="startp">Start guided practice</button>${l.extra?`<button class="ghost" id="startx">Extra practice</button>`:""}')
+    '<button id="startp">Start guided practice</button>${l.extra&&!xpDone(l.id)?`<button class="ghost" id="startx">Extra practice</button>`:""}')
 sub('$("#startp").onclick=()=>startPractice(lid);', '$("#startp").onclick=()=>startPractice(lid);if($("#startx"))$("#startx").onclick=()=>startPractice(lid,true);')
 sub('function startPractice(lid){', 'function startPractice(lid,extra){extra=!!(extra&&lessonById(lid).extra);')
 sub('qs:l.qs.map(q=>Object.assign({},q))', 'extra,qs:(extra?l.extra:l.qs).map(q=>Object.assign({},q))')
@@ -100,6 +100,35 @@ sub('S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};',
     'if(PR.extra){S.xp=S.xp||{};const px=S.xp[l.id]||{};S.xp[l.id]={done:true,best:Math.max(px.best||0,PR.first)};}else S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};')
 sub('>Lesson complete!</h2>', '>${PR.extra?"Extra practice complete!":"Lesson complete!"}</h2>')
 sub('$("#pagain").onclick=()=>startPractice(l.id);', '$("#pagain").onclick=(x=>()=>startPractice(l.id,x))(PR.extra);')
+
+# Lesson order: each lesson, then its extra practice if it has one. After extra practice the
+# main button goes to the next unfinished step; after guided practice, to the next unfinished
+# lesson (this lesson's extra practice is offered beside it). The lessons page opens scrolled
+# to the first unfinished step, marked "Up next".
+sub('function home(){\n V={view:"home"};', r"""function xpDone(lid){return !!(S.xp&&S.xp[lid]&&S.xp[lid].done);}
+function lessonDone(lid){return !!(S.p[lid]&&S.p[lid].done);}
+function orderedLessons(t){return TERM_MODS[t].flatMap(m=>LESSONS.filter(l=>l.mod===m));}
+function termOfLesson(l){return TERM_MODS[1].includes(l.mod)?1:2;}
+function lessonSteps(t){const out=[];orderedLessons(t).forEach(l=>{out.push({l,extra:false,done:lessonDone(l.id)});if(l.extra)out.push({l,extra:true,done:xpDone(l.id)});});return out;}
+function nextAfter(l,extra){
+ if(extra){const st=lessonSteps(termOfLesson(l)),i=st.findIndex(s=>s.l.id===l.id&&s.extra);return st.slice(i+1).find(s=>!s.done)||null;}
+ const ls=orderedLessons(termOfLesson(l)),i=ls.findIndex(x=>x.id===l.id),n=ls.slice(i+1).find(x=>!lessonDone(x.id));return n?{l:n,extra:false}:null;
+}
+function goStep(s){if(s.extra)startPractice(s.l.id,true);else learn(s.l.id);}
+function scrollToNext(){
+ const s=lessonSteps(curT()).find(x=>!x.done);if(!s)return;
+ const b=document.querySelector(`[data-learn="${s.l.id}"]`),c=b&&b.closest(".card");if(!c)return;
+ c.classList.add("upnext");setTimeout(()=>c.scrollIntoView({block:"center"}),40);
+}
+function home(){
+ const cameFrom=V.view;V={view:"home"};""")
+sub(' bindFacts();\n save();\n}', ' bindFacts();\n if(TAB==="learn"&&cameFrom!=="home")scrollToNext();\n save();\n}')
+sub('let S=blankState(),V={view:"home"}', 'let S=blankState(),V={view:"start"}')
+sub('${nx?`<button id="pnxt">Next lesson: ${esc(nx.title)}</button>`:""}',
+    '${nxs?`<button id="pnxt">${nxs.extra?"Next: Extra practice for "+esc(nxs.l.title):"Next lesson: "+esc(nxs.l.title)}</button>`:""}${!PR.extra&&l.extra&&!xpDone(l.id)?`<button class="ghost" id="pxtra">Extra practice</button>`:""}')
+sub('if(nx)$("#pnxt").onclick=()=>learn(nx.id);', 'if(nxs)$("#pnxt").onclick=()=>goStep(nxs);if($("#pxtra"))$("#pxtra").onclick=()=>startPractice(l.id,true);')
+sub('const TL=termLessons(TERM_MODS[1].includes(l.mod)?1:2),idx=TL.findIndex(x=>x.id===l.id),nx=TL[idx+1];',
+    'const nxs=nextAfter(l,PR.extra);')
 
 # Graded activities: no clock or suggested times on screen (they caused anxiety).
 # Time is still recorded quietly and stays in the copied report for the teacher.
@@ -205,6 +234,8 @@ css += ('\n.acct{display:inline-block;padding:6px 14px;border-radius:12px;backgr
         '\n.acct.ghost{background:transparent;color:var(--ink);border:3px solid var(--line)}'
         '\n.ready{background:var(--panel);border:3px solid var(--gold);border-radius:18px;padding:12px 18px;margin-top:16px}'
         '\n.readyrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:21px;padding:4px 0;text-align:left}'
+        '\n.card.upnext{outline:4px solid var(--gold);outline-offset:2px}'
+        '\n.card.upnext::before{content:"Up next";display:inline-block;background:var(--gold);color:#3b2a00;font-weight:800;font-size:15px;border-radius:999px;padding:2px 12px;margin-bottom:8px}'
         '\n.readyrow b{color:var(--accent);font-family:Fredoka,sans-serif;font-weight:600;font-size:24px}\n')
 js = t[t.index('<script>\n/* =====') + 8:t.rindex('</script>')]
 open('pilot-academy-app/app.css', 'w', encoding='utf-8').write(css)

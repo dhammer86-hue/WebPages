@@ -87,7 +87,7 @@ function gradeQ(q,val){
 function answerText(q){const d=dec(q);if(q.t==="list")return d.a.join(", ");return d.a;}
 
 /* ===== state and saving ===== */
-let S=blankState(),V={view:"home"},TAB="learn",DRAW={},streak=0;
+let S=blankState(),V={view:"start"},TAB="learn",DRAW={},streak=0;
 function blankState(){return{v:2,updated:0,a:{},p:{},miles:0,drag:0,term:1};}
 const TERM_MODS={1:["m1","m2","m3","m4","m5"],2:["m6","m7","m8","m9","m10"]};
 const tOf=it=>it.term||1;
@@ -257,10 +257,25 @@ function itemCard(it){
 }
 function learnTab(){
  const mods=TERM_MODS[curT()];
- return `<p class="tip" style="margin:14px 2px 0">Work through these lessons together. Each lesson has a short mini-lesson, then guided practice. Earn flight miles for correct answers.</p>`+mods.map(m=>`<h2 class="modh">${esc(MANUAL[m].title)}</h2><div class="grid">${LESSONS.filter(l=>l.mod===m).map(l=>{const p=S.p[l.id];const dn=p&&p.done;return `<div class="card item">${picHTML(l.id)}<span class="chip">Lesson</span><h3>${esc(l.title)}</h3><div class="status ${dn?"done":""}">${dn?"Complete":"Not started"}</div>${dn?`<div class="stars" aria-label="${p.stars} of 3 stars">${[1,2,3].map(n=>starSVG(n<=p.stars)).join("")}</div>`:""}${l.extra&&S.xp&&S.xp[l.id]?`<div class="meta">Extra practice done: ${S.xp[l.id].best} of ${l.extra.length} first try</div>`:""}<div class="row"><button data-learn="${l.id}">${dn?"Review lesson":"Open lesson"}</button><button class="ghost" data-prac="${l.id}">Guided practice</button>${l.extra?`<button class="ghost" data-xprac="${l.id}">Extra practice</button>`:""}</div></div>`;}).join("")}</div>`).join("");
+ return `<p class="tip" style="margin:14px 2px 0">Work through these lessons together. Each lesson has a short mini-lesson, then guided practice. Earn flight miles for correct answers.</p>`+mods.map(m=>`<h2 class="modh">${esc(MANUAL[m].title)}</h2><div class="grid">${LESSONS.filter(l=>l.mod===m).map(l=>{const p=S.p[l.id];const dn=p&&p.done;return `<div class="card item">${picHTML(l.id)}<span class="chip">Lesson</span><h3>${esc(l.title)}</h3><div class="status ${dn?"done":""}">${dn?"Complete":"Not started"}</div>${dn?`<div class="stars" aria-label="${p.stars} of 3 stars">${[1,2,3].map(n=>starSVG(n<=p.stars)).join("")}</div>`:""}${l.extra&&S.xp&&S.xp[l.id]?`<div class="meta">Extra practice done: ${S.xp[l.id].best} of ${l.extra.length} first try</div>`:""}<div class="row"><button data-learn="${l.id}">${dn?"Review lesson":"Open lesson"}</button><button class="ghost" data-prac="${l.id}">Guided practice</button>${l.extra&&!xpDone(l.id)?`<button class="ghost" data-xprac="${l.id}">Extra practice</button>`:""}</div></div>`;}).join("")}</div>`).join("");
+}
+function xpDone(lid){return !!(S.xp&&S.xp[lid]&&S.xp[lid].done);}
+function lessonDone(lid){return !!(S.p[lid]&&S.p[lid].done);}
+function orderedLessons(t){return TERM_MODS[t].flatMap(m=>LESSONS.filter(l=>l.mod===m));}
+function termOfLesson(l){return TERM_MODS[1].includes(l.mod)?1:2;}
+function lessonSteps(t){const out=[];orderedLessons(t).forEach(l=>{out.push({l,extra:false,done:lessonDone(l.id)});if(l.extra)out.push({l,extra:true,done:xpDone(l.id)});});return out;}
+function nextAfter(l,extra){
+ if(extra){const st=lessonSteps(termOfLesson(l)),i=st.findIndex(s=>s.l.id===l.id&&s.extra);return st.slice(i+1).find(s=>!s.done)||null;}
+ const ls=orderedLessons(termOfLesson(l)),i=ls.findIndex(x=>x.id===l.id),n=ls.slice(i+1).find(x=>!lessonDone(x.id));return n?{l:n,extra:false}:null;
+}
+function goStep(s){if(s.extra)startPractice(s.l.id,true);else learn(s.l.id);}
+function scrollToNext(){
+ const s=lessonSteps(curT()).find(x=>!x.done);if(!s)return;
+ const b=document.querySelector(`[data-learn="${s.l.id}"]`),c=b&&b.closest(".card");if(!c)return;
+ c.classList.add("upnext");setTimeout(()=>c.scrollIntoView({block:"center"}),40);
 }
 function home(){
- V={view:"home"};
+ const cameFrom=V.view;V={view:"home"};
  const T=curT(),TI=termItems(T),TL=termLessons(T);
  const g=termGrade(T),done=TI.filter(it=>{const r=result(it);return r&&r.done;}).length;
  const lessonsDone=TL.filter(l=>S.p[l.id]&&S.p[l.id].done).length;
@@ -284,6 +299,7 @@ function home(){
  document.querySelectorAll("[data-prac]").forEach(b=>b.onclick=()=>startPractice(b.dataset.prac));document.querySelectorAll("[data-xprac]").forEach(b=>b.onclick=()=>startPractice(b.dataset.xprac,true));
  $("#treset").onclick=teacherTools;
  bindFacts();
+ if(TAB==="learn"&&cameFrom!=="home")scrollToNext();
  save();
 }
 async function teacherTools(){
@@ -427,7 +443,7 @@ let PR=null;
 function lessonBody(l){return `<p class="idea">${esc(l.idea)}</p><h3>Key ideas</h3><ul>${l.points.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><div class="scenario"><b>Try it together:</b> ${esc(l.ex_q)}</div><ol>${l.ex_steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;}
 function learn(lid){
  const l=lessonById(lid);V={view:"learn",id:lid};
- app.innerHTML=topbar()+`<div class="card manual" style="margin-top:12px"><button class="ghost" id="hang">Back to lessons</button><div style="margin-top:12px"><span class="chip">${esc(MANUAL[l.mod].title)}</span></div><h2 style="font-size:32px;margin:8px 0">${esc(l.title)}</h2>${factHTML(l.id)}${lessonBody(l)}<div class="row"><button id="startp">Start guided practice</button>${l.extra?`<button class="ghost" id="startx">Extra practice</button>`:""}<button class="ghost" id="manb">Flight manual</button></div></div>`;
+ app.innerHTML=topbar()+`<div class="card manual" style="margin-top:12px"><button class="ghost" id="hang">Back to lessons</button><div style="margin-top:12px"><span class="chip">${esc(MANUAL[l.mod].title)}</span></div><h2 style="font-size:32px;margin:8px 0">${esc(l.title)}</h2>${factHTML(l.id)}${lessonBody(l)}<div class="row"><button id="startp">Start guided practice</button>${l.extra&&!xpDone(l.id)?`<button class="ghost" id="startx">Extra practice</button>`:""}<button class="ghost" id="manb">Flight manual</button></div></div>`;
  S.seen=S.seen||{};if(!S.seen[lid]){S.seen[lid]=true;save();}
  $("#hang").onclick=home;$("#startp").onclick=()=>startPractice(lid);if($("#startx"))$("#startx").onclick=()=>startPractice(lid,true);$("#manb").onclick=()=>openManual([l.mod]);
 }
@@ -486,10 +502,10 @@ function pFinish(){
  const l=lessonById(PR.lid),n=PR.n0,r=PR.first/n,st=r>=.9?3:r>=.7?2:1;
  const prev=S.p[l.id]||{stars:0};
  const wasReady=ITEMS.filter(isReady).map(x=>x.id);if(PR.extra){S.xp=S.xp||{};const px=S.xp[l.id]||{};S.xp[l.id]={done:true,best:Math.max(px.best||0,PR.first)};}else S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};save();const nowReady=ITEMS.filter(x=>isReady(x)&&!wasReady.includes(x.id));
- const TL=termLessons(TERM_MODS[1].includes(l.mod)?1:2),idx=TL.findIndex(x=>x.id===l.id),nx=TL[idx+1];
+ const nxs=nextAfter(l,PR.extra);
  V={view:"pfinish",id:l.id};
- app.innerHTML=topbar()+`<section class="card" style="margin-top:12px;text-align:center"><h2 style="font-size:34px;color:var(--accent)">${PR.extra?"Extra practice complete!":"Lesson complete!"}</h2>${readyHTML(nowReady)}<p>${esc(l.title)}</p><div class="row" style="justify-content:center">${[1,2,3].map(k=>starSVG(k<=st)).join("")}</div><p>${PR.first} of ${n} right on the first try. Miles earned: ${PR.gained}. Mistakes (drag): ${PR.mistakes}.</p>${PR.redos>0?`<div class="scenario" style="max-width:520px;margin:12px auto"><b>Mystery surprise unlocked!</b><br>You finished every missed question. Open the box to see what you won.<div class="row" style="justify-content:center"><button id="mbox">Open mystery box</button></div><div id="mprize" aria-live="polite"></div></div>`:""}<div class="row" style="justify-content:center">${nx?`<button id="pnxt">Next lesson: ${esc(nx.title)}</button>`:""}<button class="ghost" id="pagain">Practice again</button><button class="ghost" id="ptomap">Back to lessons</button></div></section>`;
- document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openItem(b.dataset.open));if(nx)$("#pnxt").onclick=()=>learn(nx.id);
+ app.innerHTML=topbar()+`<section class="card" style="margin-top:12px;text-align:center"><h2 style="font-size:34px;color:var(--accent)">${PR.extra?"Extra practice complete!":"Lesson complete!"}</h2>${readyHTML(nowReady)}<p>${esc(l.title)}</p><div class="row" style="justify-content:center">${[1,2,3].map(k=>starSVG(k<=st)).join("")}</div><p>${PR.first} of ${n} right on the first try. Miles earned: ${PR.gained}. Mistakes (drag): ${PR.mistakes}.</p>${PR.redos>0?`<div class="scenario" style="max-width:520px;margin:12px auto"><b>Mystery surprise unlocked!</b><br>You finished every missed question. Open the box to see what you won.<div class="row" style="justify-content:center"><button id="mbox">Open mystery box</button></div><div id="mprize" aria-live="polite"></div></div>`:""}<div class="row" style="justify-content:center">${nxs?`<button id="pnxt">${nxs.extra?"Next: Extra practice for "+esc(nxs.l.title):"Next lesson: "+esc(nxs.l.title)}</button>`:""}${!PR.extra&&l.extra&&!xpDone(l.id)?`<button class="ghost" id="pxtra">Extra practice</button>`:""}<button class="ghost" id="pagain">Practice again</button><button class="ghost" id="ptomap">Back to lessons</button></div></section>`;
+ document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openItem(b.dataset.open));if(nxs)$("#pnxt").onclick=()=>goStep(nxs);if($("#pxtra"))$("#pxtra").onclick=()=>startPractice(l.id,true);
  $("#pagain").onclick=(x=>()=>startPractice(l.id,x))(PR.extra);$("#ptomap").onclick=home;
  const mb=$("#mbox");
  if(mb)mb.onclick=()=>{const p=PRIZES[Math.floor(Math.random()*PRIZES.length)];S.miles+=p.m;save();mb.disabled=true;mb.textContent="Box opened!";$("#mprize").innerHTML=`<div class="prize"><b>${esc(p.t)}</b><br>${esc(p.x)}<br><b>+${p.m} bonus miles</b></div>`;};
