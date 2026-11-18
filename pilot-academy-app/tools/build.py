@@ -42,6 +42,17 @@ for key, p in fleet.items():
         open(f'pilot-img/{key}.jpg', 'wb').write(base64.b64decode(m.group(1)))
         p['img'] = f'{SITE}/pilot-img/{key}.jpg'
 lines[fi] = 'const FLEET=' + json.dumps(fleet, ensure_ascii=False, separators=(',', ':')) + ';'
+
+# Optional extra practice for some lessons, kept in source/extra-practice.json.
+import os
+extra = json.load(open(os.path.join(os.path.dirname(sys.argv[1]), 'extra-practice.json'), encoding='utf-8'))
+li = next(i for i, l in enumerate(lines) if l.startswith('const LESSONS='))
+lessons = json.loads(lines[li][len('const LESSONS='):].rstrip(';'))
+for l in lessons:
+    if l['id'] in extra:
+        l['extra'] = [dict(q, id=f"{l['id']}-x{n + 1}", work=q.get('work')) for n, q in enumerate(extra.pop(l['id']))]
+assert not extra, 'Extra practice for unknown lessons: ' + ', '.join(extra)
+lines[li] = 'const LESSONS=' + json.dumps(lessons, ensure_ascii=False, separators=(',', ':')) + ';'
 t = '\n'.join(lines)
 
 # Work area: a tap with no movement still leaves a dot (or erases a spot).
@@ -70,6 +81,26 @@ sub('S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};save();',
 sub('Lesson complete!</h2>', 'Lesson complete!</h2>${readyHTML(nowReady)}')
 sub('if(nx)$("#pnxt").onclick=()=>learn(nx.id);', 'document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openItem(b.dataset.open));if(nx)$("#pnxt").onclick=()=>learn(nx.id);')
 
+# Extra practice: a second, optional question set for a lesson. It earns miles but leaves
+# the lesson's stars and the "It's time for..." messages alone.
+sub('<button class="ghost" data-prac="${l.id}">Guided practice</button>',
+    '<button class="ghost" data-prac="${l.id}">Guided practice</button>${l.extra?`<button class="ghost" data-xprac="${l.id}">Extra practice</button>`:""}')
+sub('<div class="row"><button data-learn="${l.id}">',
+    '${l.extra&&S.xp&&S.xp[l.id]?`<div class="meta">Extra practice done: ${S.xp[l.id].best} of ${l.extra.length} first try</div>`:""}<div class="row"><button data-learn="${l.id}">')
+sub('document.querySelectorAll("[data-prac]").forEach(b=>b.onclick=()=>startPractice(b.dataset.prac));',
+    'document.querySelectorAll("[data-prac]").forEach(b=>b.onclick=()=>startPractice(b.dataset.prac));document.querySelectorAll("[data-xprac]").forEach(b=>b.onclick=()=>startPractice(b.dataset.xprac,true));')
+sub('<button id="startp">Start guided practice</button>',
+    '<button id="startp">Start guided practice</button>${l.extra?`<button class="ghost" id="startx">Extra practice</button>`:""}')
+sub('$("#startp").onclick=()=>startPractice(lid);', '$("#startp").onclick=()=>startPractice(lid);if($("#startx"))$("#startx").onclick=()=>startPractice(lid,true);')
+sub('function startPractice(lid){', 'function startPractice(lid,extra){extra=!!(extra&&lessonById(lid).extra);')
+sub('qs:l.qs.map(q=>Object.assign({},q))', 'extra,qs:(extra?l.extra:l.qs).map(q=>Object.assign({},q))')
+sub('n0:l.qs.length', 'n0:(extra?l.extra:l.qs).length')
+sub('<b>${esc(l.title)}</b><div id="pchips">', '<b>${esc(l.title)}${PR.extra?" | Extra practice":""}</b><div id="pchips">')
+sub('S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};',
+    'if(PR.extra){S.xp=S.xp||{};const px=S.xp[l.id]||{};S.xp[l.id]={done:true,best:Math.max(px.best||0,PR.first)};}else S.p[l.id]={done:true,stars:Math.max(prev.stars||0,st)};')
+sub('>Lesson complete!</h2>', '>${PR.extra?"Extra practice complete!":"Lesson complete!"}</h2>')
+sub('$("#pagain").onclick=()=>startPractice(l.id);', '$("#pagain").onclick=(x=>()=>startPractice(l.id,x))(PR.extra);')
+
 # Graded activities: no clock or suggested times on screen (they caused anxiety).
 # Time is still recorded quietly and stays in the copied report for the teacher.
 sub('<div class="timer" id="timer">${fmtTime(a.secs)}</div>', '')
@@ -81,7 +112,7 @@ sub('<div class="tip">Time: about ${Math.max(1,Math.round(a.secs/60))} minutes (
 
 # Teacher resets are dated so an older copy on another device cannot bring the work back.
 sub('delete S.a[b.dataset.r];save();', 'delete S.a[b.dataset.r];S.resetAt=Date.now();save();')
-sub('S.p={};S.miles=0;S.drag=0;streak=0;save();', 'S.p={};S.miles=0;S.drag=0;streak=0;S.resetAt=Date.now();save();')
+sub('S.p={};S.miles=0;S.drag=0;streak=0;save();', 'S.p={};S.xp={};S.miles=0;S.drag=0;streak=0;S.resetAt=Date.now();save();')
 
 # Sign in or sign out button in the top bar.
 sub('<div class="userchip"><span id="savestat"></span></div>',
@@ -138,11 +169,12 @@ function mergeProgress(list){
  const reset=Math.max(0,...list.map(s=>s.resetAt||0));
  list=list.filter(s=>(s.updated||0)>=reset);
  list.sort((a,b)=>(b.updated||0)-(a.updated||0));
- const m=JSON.parse(JSON.stringify(list[0]));m.a={};m.p={};m.seen={};
+ const m=JSON.parse(JSON.stringify(list[0]));m.a={};m.p={};m.seen={};m.xp={};
  list.forEach(s=>{
   Object.keys(s.a||{}).forEach(id=>{if(progressScore(s.a[id])>progressScore(m.a[id]))m.a[id]=s.a[id];});
   Object.keys(s.p||{}).forEach(id=>{const c=m.p[id],n=s.p[id];m.p[id]=c?{done:!!(c.done||n.done),stars:Math.max(c.stars||0,n.stars||0)}:n;});
   Object.assign(m.seen,s.seen||{});
+  Object.keys(s.xp||{}).forEach(id=>{const c=m.xp[id],n=s.xp[id];m.xp[id]=c?{done:true,best:Math.max(c.best||0,n.best||0)}:n;});
  });
  m.miles=Math.max(...list.map(s=>s.miles||0));m.drag=Math.max(...list.map(s=>s.drag||0));
  m.p=m.p||{};return m;
