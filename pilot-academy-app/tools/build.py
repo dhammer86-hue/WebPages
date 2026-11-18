@@ -1,6 +1,8 @@
 """Build the hosted Pilot Academy files from the page Claude made in the artifact.
 
-    python3 -I pilot-academy-app/tools/build.py <artifact page.html>
+    python3 -I pilot-academy-app/tools/build.py pilot-academy-app/source/alex-pilot-academy.html
+
+Save each new version of the artifact page over that source file first.
 
 Run from the repository root. It writes:
   pilot-img/pN.jpg                    the museum pictures, moved out of the page
@@ -47,6 +49,15 @@ sub('cv.addEventListener("pointerdown",e=>{down=true;[lx,ly]=pos(e);cv.setPointe
     'cv.addEventListener("pointerdown",e=>{down=true;[lx,ly]=pos(e);cv.setPointerCapture(e.pointerId);e.preventDefault();'
     'ctx.globalCompositeOperation=erase?"destination-out":"source-over";ctx.fillStyle=color;'
     'ctx.beginPath();ctx.arc(lx,ly,(erase?26:3.5)/2,0,Math.PI*2);ctx.fill();});')
+
+# Graded activities: no clock or suggested times on screen (they caused anxiety).
+# Time is still recorded quietly and stays in the copied report for the teacher.
+sub('<div class="timer" id="timer">${fmtTime(a.secs)}</div>', '')
+sub('Suggested time: ${it.min} minutes${isHW?" | Points:', '${isHW?"Points:')
+sub('" | Each question is worth 4 points. Show your work for partial credit."}', '"Each question is worth 4 points. Show your work for partial credit."}')
+sub('<div class="meta">About ${it.min} minutes | ${esc(it.when)}</div>', '<div class="meta">${esc(it.when)}</div>')
+sub('<div class="warn">About ${it.min} minutes. ${esc(rules)}', '<div class="warn">${esc(rules)}')
+sub('<div class="tip">Time: about ${Math.max(1,Math.round(a.secs/60))} minutes (suggested ${it.min})</div>', '')
 
 # Teacher resets are dated so an older copy on another device cannot bring the work back.
 sub('delete S.a[b.dataset.r];save();', 'delete S.a[b.dataset.r];S.resetAt=Date.now();save();')
